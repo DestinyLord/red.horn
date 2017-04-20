@@ -77,11 +77,14 @@ class Menu extends MY_Controller
     {
         noPrivShowMsg('menuAdd'); 
         $this->form_validation->set_rules("menu_title","菜单名称","trim|required");
+
         if($this->form_validation->run()==FALSE)
 		{
 			echo_msg(validation_errors());
-		}    
+		}
+
         $res = $this->Admin_menu_model->insertMenu();
+
         if($res)
         {
             echo_msg(10003 ,site_url(BACKEND_DIR_NAME.'/menu') ,'yes');
