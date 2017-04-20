@@ -1,0 +1,6 @@
+/*分页的样式*/
+.pagination{float: left; position: relative; left:50%;}
+.pagination:after{content:"."; font-size: 0px; display: block; clear:both;}
+.pagination li{float:left; list-style: none; position: relative; right: 50%; border: 1px solid #ebebeb; line-height: 30px; width: 30px; text-align: center;}
+.pagination li>a{display: block;}
+.pagination li.active >a,.pagination li>a:hover{background: #c90028;color: #fff;}
