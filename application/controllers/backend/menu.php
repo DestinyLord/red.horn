@@ -88,7 +88,8 @@ class Menu extends MY_Controller
         if($res)
         {
             echo_msg(10003 ,site_url(BACKEND_DIR_NAME.'/menu') ,'yes');
-        }else
+        }
+        else
         {
             echo_msg(10004 );
         }
