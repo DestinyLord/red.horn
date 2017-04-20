@@ -52,13 +52,13 @@ class Admin_menu_model extends Core_model
             return $result;
         }
     }
-    
+
     /**
-     * 插入记录
-     * @author  alan    2014.7.21
-     * @return  INT OR Boolean   插入的新ID 或 FALSE  
-     */ 
-    function insertRecord()
+     * 新增菜单操作
+     *
+     * @return bool
+     */
+    function insertMenu()
 	{
 	   $parent_id = $this->input->post('parent_id');
        $menuTitle = $this->input->post('menu_title');
@@ -115,79 +115,82 @@ class Admin_menu_model extends Core_model
 			return FALSE;
 		}
 	}
-    
+
     /**
-     * 更改记录
-     * @author  alan    2014.7.22
-     * @return  Boolean   TRUE 或 FALSE  
+     * 修改菜单操作
+     *
+     * @param $id
+     * @param $menuTitle
+     * @param $parentId
+     * @param $oldParentId
+     * @param $updateData
+     * @return bool
      */
-    function updateRecord()
+    function updateMenu($id, $menuTitle, $parentId, $oldParentId, $updateData)
 	{
-		$parent_id=$this->input->post("parent_id");
-		$old_parent_id=$this->input->post("old_parent_id");
-		$id=$this->input->post("id");
-        $menuTitle = $this->input->post('menu_title');
-        
-        $options = array(
-            'parent_id'     => $parent_id,
-            'menu_title'    => $menuTitle,
-            'icon_class'    => $this->input->post('icon_class'),
-            'menu_url'      => $this->input->post('menu_url'),
-            'action_code'   => $this->input->post('action_code'),
-            'seqorder'      => $this->input->post('seqorder'),
-        );
-        
         //如果更改了父ID ,就更新父ID的记录和自己的记录
-		if($parent_id != $old_parent_id)
+		if($parentId != $oldParentId)
 		{
-			$query=$this->db->get_where("admin_menu",array('id'=>$parent_id));
-			if($query->num_rows()>0)
+            $row   = $this->getMenuItem(['where' => ['id' => $parentId]]);
+
+			if(!empty($row))
 			{
-				$row=$query->row_array();
-				$level=(int)$row['level']+1;
-				$queue=$row['queue'].$id.",";
+				$level = (int)$row['level'] + 1;
+				$queue = $row['queue'] . $id . ",";
 			}
 			else
 			{
-				$level=0;
-				$queue=",".$id.",";
+				$level = 0;
+				$queue = "," . $id . ",";
 			}
             
-			$options['queue'] = $queue;
-            $options['level'] = $level;
+			$updateData['queue'] = $queue;
+            $updateData['level'] = $level;
+
+            $res = $this->update($this->_tableName, $updateData, ['id' => $id]);
             
-			$this->db->update("admin_menu",$options,array('id'=>$id));            
-            $res = $this->db->affected_rows();//是否修改成功标识
-            
-			if($old_parent_id)
+			if(!empty($oldParentId))
 			{
-				$query=$this->db->get_where("admin_menu",array('parent_id'=>$old_parent_id));//检查原来的父ID里面是否还有子菜单
-				if($query->num_rows()>0)
+                //检查原来的父ID里面是否还有子菜单
+                $oldHasChild = $this->getTotals(
+                    $this->_tableName, ['where' => ['parent_id' => $oldParentId]]
+                );
+
+				if($oldHasChild > 0)
 				{
-					$this->db->update("admin_menu",array("has_child"=>1),array('id'=>$old_parent_id));
+				    $this->update(
+				        $this->_tableName, ['has_child' => 1], ['id'=>$oldParentId]
+                    );
 				}
 				else
 				{
-					$this->db->update("admin_menu",array("has_child"=>0),array('id'=>$old_parent_id));
+                    $this->update(
+                        $this->_tableName, ['has_child' => 0], ['id'=>$oldParentId]
+                    );
 				}
 			}
-			if($parent_id)//这条记录的父ID肯定是存在子元素
+
+			if(!empty($parentId))//这条记录的父ID肯定是存在子元素
 			{
-				$this->db->update("admin_menu",array("has_child"=>1),array('id'=>$parent_id));
+                $this->update(
+                    $this->_tableName, ['has_child' => 1], ['id'=>$parentId]
+                );
 			}
-			$hasChd = $this->input->post("has_child");
-			if($hasChd)
+
+			$hasChild = $this->input->post("has_child");
+
+			if($hasChild)
 			{
-				$this->update_qd($id,$queue,$level);
+				$this->updateQD($id, $queue, $level);
 			}
-		}else
+		}
+		else
         {
-            $this->db->update("admin_menu",$options,array('id'=>$id));
+            $this->db->update("admin_menu",$updateData,array('id'=>$id));
             
             $res = $this->db->affected_rows();//是否修改成功标识
         }
         
-        //echo $this->db->last_query();exit;
         if($res > 0)
         {
             // 添加操作日志
@@ -211,73 +214,47 @@ class Admin_menu_model extends Core_model
      * @param   $queue  String  目录树
      * @param   $level  INT     目录级别     
      */ 
-    function update_qd($pid,$queue,$level)
+    function updateQD($pid, $queue, $level)
 	{
-		$query=$this->db->get_where("admin_menu",array('parent_id'=>$pid));
-        if($query->num_rows() > 0)
-        {
-            $res = $query->result();
-    		foreach($res as $row)
-    		{
-    			$data=array(
-    				'level'=>$level+1,
-    				'queue'=>$queue.$row->id.","
-    			);
-    			$this->db->update("admin_menu",$data,array('id'=>$row->id));
+		$data = $this->getMenuItems(['where' => ['parent_id' => $pid]]);
 
-    			if($row->has_child)
-    			{
-    				$this->update_qd($row->id,$data['queue'],$data['deep_id']);
-    			}
-    		}
+		if (!empty($data))
+        {
+            foreach ($data as $item)
+            {
+                $updateData = [
+                    'level' => $level + 1,
+                    'queue' => $queue . $item['id'] . ","
+                ];
+                $this->update($this->_tableName, $updateData, ['id' => $item['id']]);
+
+                if ($item['has_child'])
+                {
+                    $this->updateQD(
+                        $item['id'], $updateData['queue'], $updateData['deep_id']
+                    );
+                }
+            }
         }
 	}
-    
-    
-    /**
-     * 删除记录
-     * @author  alan    2014.7.22
-     */
-    function deleteRecord()
-    {
-        $ids = intval($this->input->get('id'));
-        
-        $where = '';
-        if(is_array($ids))
-        {
-            $where .= ' id IN ('.implode(',' ,$ids).')';
-        }else
-        {
-            $where .= ' id = '.$ids;
-        }
-        $query = $this->db->query('SELECT * FROM '.DBPREFIX.'admin_menu WHERE '.$where); 
-        if($query->num_rows() > 0)
-        {
-            if(is_array($ids))
-            {
-                $data = $query->result_array();
-            }else
-            {
-                $data = $query->row_array();
-            }
-        }
 
-        $deleteSql = 'DELETE FROM '.DBPREFIX.'admin_menu WHERE '.$where;
-        $this->db->query($deleteSql);
-        if($this->db->affected_rows() > 0)
+
+    /**
+     * 删除菜单操作
+     *
+     * @param $id
+     * @return bool
+     */
+    function deleteMenu($id)
+    {
+        $data   = $this->getMenuItem(['where' => ['id' => $id]]);
+        $result = FALSE;
+
+        if (!empty($data))
         {
-            if(is_array($ids)) //如果是批量删除
-            {
-                foreach($data as $v)
-                {
-                    // 添加操作日志
-                    $this->load->model(BACKEND_MODEL_DIR_NAME . '/Admin_log_model');
-                    $this->Admin_log_model->setAdminLog(
-                        '批量删除菜单：'.$v['menu_title']
-                    );
-                }     
-            }
-            else
+            $result = $this->delete($this->_tableName, ['id' => $id]);
+
+            if (!empty($result))
             {
                 // 添加操作日志
                 $this->load->model(BACKEND_MODEL_DIR_NAME . '/Admin_log_model');
@@ -285,11 +262,9 @@ class Admin_menu_model extends Core_model
                     '删除菜单：'.$data['menu_title']
                 );
             }
-            return true;
-        }else
-        {
-            return false;
         }
+
+        return $result;
     } 
 
 }

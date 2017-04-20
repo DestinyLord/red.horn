@@ -21,11 +21,10 @@ class Menu extends MY_Controller
         $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['menu']);//位置信息
         $this->template->display('index.tpl');
 	}
-    
+
     /**
      * 菜单新增页面
-     * @author  alan    2014.7.22   
-     */ 
+     */
     function add()
     {
         noPrivShowMsg('menuAdd');
@@ -82,7 +81,7 @@ class Menu extends MY_Controller
 		{
 			echo_msg(validation_errors());
 		}    
-        $res = $this->Admin_menu_model->insertRecord();
+        $res = $this->Admin_menu_model->insertMenu();
         if($res)
         {
             echo_msg(10003 ,site_url(BACKEND_DIR_NAME.'/menu') ,'yes');
@@ -91,43 +90,76 @@ class Menu extends MY_Controller
             echo_msg(10004 );
         }
     }
-    
+
     /**
-     * 修改处理
-     * @author  alan    2014.7.22
-     */ 
+     * 修改菜单操作
+     */
     function update()
     {
-        noPrivShowMsg('menuEdit');   
-        $this->form_validation->set_rules("menu_title","菜单名称","trim|required");
+        noPrivShowMsg('menuEdit');
+        $this->form_validation->set_rules(
+            "menu_title", "菜单名称", "trim|required"
+        );
+
         if($this->form_validation->run()==FALSE)
 		{
 			echo_msg(validation_errors());
-		}  
-        $res = $this->Admin_menu_model->updateRecord();
+		}
+
+        $id          = $this->input->post("id");
+        $menuTitle   = $this->input->post('menu_title');
+        $parentId    = $this->input->post("parent_id");
+        $oldParentId = $this->input->post("old_parent_id");
+        $updateData  = [
+            'parent_id'   => $parentId,
+            'menu_title'  => $menuTitle,
+            'icon_class'  => $this->input->post('icon_class'),
+            'menu_url'    => $this->input->post('menu_url'),
+            'action_code' => $this->input->post('action_code'),
+            'seqorder'    => $this->input->post('seqorder'),
+        ];
+
+        $res = $this->Admin_menu_model->updateMenu(
+            $id, $menuTitle, $parentId, $oldParentId, $updateData
+        );
+
         if($res)
         {
-            echo_msg(10000 ,site_url(BACKEND_DIR_NAME.'/menu') ,'yes');
-        }else
+            echo_msg(10000, site_url(BACKEND_DIR_NAME.'/menu'), 'yes');
+        }
+        else
         {
-            echo_msg(10001 );
+            echo_msg(10001);
         }
     }
-    
+
     /**
-     * 删除处理
-     * @author  alan    2014.7.22
-     */ 
+     * 删除菜单操作
+     */
     function delete()
     {
         noPrivShowMsg('menuDel');
-        $res = $this->Admin_menu_model->deleteRecord();
-        if($res)
+        $id     = intval($this->input->get('id'));
+        $isUsed = $this->Admin_menu_model->getMenuItem(
+            ['where' => ['parent_id' => $id]]
+        );
+
+        if (!empty($isUsed))
         {
-            echo_msg(10005, site_url(BACKEND_DIR_NAME.'/menu'), 'yes');
-        }else
+            echo_msg(10014);
+        }
+        else
         {
-            echo_msg(10006);
+            $res = $this->Admin_menu_model->deleteMenu($id);
+
+            if($res)
+            {
+                echo_msg(10005, site_url(BACKEND_DIR_NAME.'/menu'), 'yes');
+            }
+            else
+            {
+                echo_msg(10006);
+            }
         }
     }
 }
