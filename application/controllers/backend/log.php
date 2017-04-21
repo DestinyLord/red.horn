@@ -6,8 +6,8 @@ class Log extends MY_Controller
 		parent::__construct();
         //echo date('Y-m-d H:i:s' ,1407402480720 /1000);exit;
         check_admin_is_login();
-        $this->template->set_folder(BACKEND_VIEW_DIR_NAME.'/log');
-        $this->load->model(BACKEND_MODEL_DIR_NAME.'/Log_model');
+        $this->template->set_folder(BACKEND_VIEW_DIR_NAME . '/log');
+        $this->load->model(BACKEND_MODEL_DIR_NAME . '/Log_model');
 	}
 	
     /**
@@ -18,11 +18,11 @@ class Log extends MY_Controller
 	{
         noPrivShowMsg('adminLog');
         $datas = $this->Log_model->getRecords();
-        $this->template->assign('datas' ,$datas);
+        $this->template->assign('datas', $datas);
         
         //商务列表
-        $this->load->model(BACKEND_MODEL_DIR_NAME.'/Admin_model');
-        $adminUser = $this->Admin_model->getRecords(0);
+        $this->load->model(BACKEND_MODEL_DIR_NAME . '/Admin_model');
+        $adminUser = $this->Admin_model->getAdminItems();
         $this->template->assign('adminUser' ,$adminUser);
         
         $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['adminLog']);//位置信息

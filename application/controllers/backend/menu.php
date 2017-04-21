@@ -67,11 +67,10 @@ class Menu extends MY_Controller
         $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['menu_edit']);//位置信息
         $this->template->display('info.tpl');
     }
-    
+
     /**
-     * 添加处理
-     * @author  alan    2014.7.22
-     */ 
+     * 菜单新增处理
+     */
     public function insert()
     {
         noPrivShowMsg('menuAdd'); 
@@ -108,7 +107,7 @@ class Menu extends MY_Controller
     }
 
     /**
-     * 修改菜单操作
+     * 菜单修改处理
      */
     public function update()
     {
@@ -150,7 +149,7 @@ class Menu extends MY_Controller
     }
 
     /**
-     * 删除菜单操作
+     * 菜单删除处理
      */
     public function delete()
     {

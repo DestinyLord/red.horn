@@ -41,10 +41,9 @@ class Admin_model extends Core_model
             $this->update(
                 $this->_tableName, $data, ['username' => $username]
             );
-            
-            $this->load->model(BACKEND_MODEL_DIR_NAME.'/Admin_role_model');
 
             // 获取角色信息
+            $this->load->model(BACKEND_MODEL_DIR_NAME.'/Admin_role_model');
             $role = $this->Admin_role_model->getRoleItem(
                 ['where' => ['id' => $row['admin_role_id']]]
             );
@@ -93,7 +92,7 @@ class Admin_model extends Core_model
     }
 
     /**
-     * 根据条件获取多个管理员数据
+     * 根据条件获取多个管理员数据，除了超级管理员
      *
      * @param bool $isTree
      * @param array $params
@@ -101,36 +100,31 @@ class Admin_model extends Core_model
      */
     public function getAdminItems($isTree = TRUE, $params = [])
     {
-        $params['order_by'] = 'admin_role_id, hits DESC, id DESC';
+        $params['order_by'] = 'a.admin_role_id, a.hits DESC, a.id DESC';
+        $params['where']['a.id !='] = 1;
+        $this->load->model(BACKEND_MODEL_DIR_NAME.'/Admin_role_model');
+        $params['join']     = [
+            'table' => "{$this->Admin_role_model->_tableName} AS ar",
+            'cond'  => 'a.admin_role_id = ar.id',
+            'type'  => 'left'
+        ];
 
-        $data = $this->getItems(
-            $this->_tableName, '*', $params
+        $data   = $this->getItems(
+            "{$this->_tableName} AS a", 'a.*, ar.role_name', $params
         );
         $result = [];
 
-        print_r($data);
-        exit;
-
-        $this->getTreeMenu($data, 0, $result);
+        if ($isTree)
+        {
+            getTreeData($data, 0, $result);
+        }
+        else
+        {
+            $result = $data;
+        }
 
         return $result;
     }
-
-    /**
-     * 获取所有数据
-     * @author  alan    2014.7.21
-     * @return  Array OR false   二维数组或False
-     */ 
-    function getRecords()
-	{
-	    //$curAdminId = $this->session->userdata('admin_id');
-        $datas =  $this->parseRecords(0);
-        //if($curAdminId != 1)
-        //{
-            //unset($datas[0]);
-        //}
-        return $datas;
-	}
 	
     /**
      * 递归获取数据
@@ -210,7 +204,7 @@ class Admin_model extends Core_model
             ['where' => ['id' => $this->session->userdata('admin_id')]]
         );
         
-        if(md5($admin['salt'].$password) == $admin['password'])
+        if(md5($admin['salt'] . $password) == $admin['password'])
         {
             return true;
         }else

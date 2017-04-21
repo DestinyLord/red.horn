@@ -718,3 +718,26 @@ function jsonEcho($value)
     echo json_encode($value);
     exit;
 }
+
+/**
+ * 递归获取数组，类树结构排序
+ *
+ * @param $data
+ * @param $pid
+ * @param $result
+ */
+function getTreeData($data, $pid, &$result)
+{
+    array_map(function($item) use (&$result, $pid, $data)
+    {
+        if ($item['parent_id'] == $pid)
+        {
+            $result[] = $item;
+
+            if(!empty($item['has_child']))
+            {
+                getTreeData($data, $item['id'], $result);
+            }
+        }
+    }, $data);
+}
