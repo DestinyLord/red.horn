@@ -14,86 +14,90 @@ class Admin extends MY_Controller
 	}
 
     /**
-     * 菜单管理
+     * 管理员管理
      */
 	function index()
 	{
         noPrivShowMsg('adminUserManage');
         $datas = $this->Admin_model->getAdminItems();
-        $this->template->assign('datas' ,$datas);
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['admin']);//位置信息
+        $this->template->assign('datas', $datas);
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['admin']);//位置信息
         $this->template->display('index.tpl');
 	}
 
     /**
-     * 用户信息页面
+     * 管理员信息页面
      */
     function info()
     {
         $userData = $this->Admin_model->getUserInfo();
-        $this->template->assign('userData' ,$userData);
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['admin_user_profile']);//位置信息
+        $this->template->assign('userData', $userData);
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['admin_user_profile']);//位置信息
         $this->template->display('user_profile.tpl');
     }
 
 
     /**
-     * 添加页面
+     * 管理员新增页面
      */
     function add()
     {
         noPrivShowMsg('adminUserAdd');
         $this->load->model(BACKEND_MODEL_DIR_NAME.'/Admin_role_model');
-        $editData = array();
+        $editData = [];
         
         //上级用户
-        $adminUserList = $this->Admin_model->getRecords();
-        $this->template->assign('adminUserList' ,$adminUserList);
+        $adminUserList = $this->Admin_model->getAdminItems();
+        $this->template->assign('adminUserList', $adminUserList);
         
         //管理员角色
         $adminRole = $this->Admin_role_model->getRoleItems();
-        $this->template->assign('adminRole' ,$adminRole);
+        $this->template->assign('adminRole', $adminRole);
         
-        $this->template->assign('editData' ,$editData);
-        $this->template->assign('formAction' ,site_url(BACKEND_DIR_NAME.'/admin/insert'));
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['admin_add']);//位置信息
+        $this->template->assign('editData', $editData);
+        $this->template->assign('formAction', site_url(BACKEND_DIR_NAME.'/admin/insert'));
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['admin_add']);//位置信息
         $this->template->display('info.tpl');
     }
-    
+
     /**
-     * 修改页面
-     * @author  alan    2014.7.22
-     * @param   $id     INT     表ID     
-     */ 
+     * 管理员修改页面
+     *
+     * @param $id
+     */
     function edit($id)
     {
         noPrivShowMsg('adminUserEdit');
+
         if($id == 1 && !checkIsAdmin())
         {
             echoMsg(10008);
         }
+
         $this->load->model(BACKEND_MODEL_DIR_NAME.'/Admin_role_model');
-        $editData = array();
+        $editData = [];
+
         if($id)
         {
             $editData = $this->Admin_model->getAdminItem(
                 ['where' => ['id' => $id]]
             );
-        }else
+        }
+        else
         {
             echoMsg(10002);
         }   
         
-        $adminUserList = $this->Admin_model->getRecords();
-        $this->template->assign('adminUserList' ,$adminUserList);//左边菜单的活动判断
-        
-        //管理员角色
+        $adminUserList = $this->Admin_model->getAdminItems();
+        // 左边菜单的活动判断
+        $this->template->assign('adminUserList', $adminUserList);
+        // 管理员角色
         $adminRole = $this->Admin_role_model->getRoleItems();
-        $this->template->assign('adminRole' ,$adminRole);
-        
-        $this->template->assign('editData' ,$editData);
-        $this->template->assign('formAction' ,site_url(BACKEND_DIR_NAME.'/admin/update'));
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['admin_edit']);//位置信息
+
+        $this->template->assign('adminRole', $adminRole);
+        $this->template->assign('editData', $editData);
+        $this->template->assign('formAction', site_url(BACKEND_DIR_NAME.'/admin/update'));
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['admin_edit']);//位置信息
         $this->template->display('info.tpl');
     }
 
@@ -102,7 +106,8 @@ class Admin extends MY_Controller
      */
     function updateUserInfo()
     {
-        $options = array();
+        $options = [];
+
         //头像上传处理
         if(isset($_FILES['avatar_path']))
         {
@@ -125,6 +130,7 @@ class Admin extends MY_Controller
             }
             
         }
+
         if($this->Admin_model->updateUserInfo($options))
         {
             if($this->input->post('new_password'))
@@ -143,20 +149,19 @@ class Admin extends MY_Controller
             echoMsg(10001);
         }
     }
-    
+
     /**
      * 校验当前用户密码是否正确
-     * @author  alan    2014.7.28
      */
     function checkPasswordIsRight()
     {
         $password = $this->input->post('current_password'); 
         echo json_encode($this->Admin_model->checkPasswordIsRight($password));
-    } 
+    }
+
     /**
-     * 添加处理
-     * @author  alan    2014.7.22
-     */ 
+     * 管理员新增处理
+     */
     function insert()
     {
         noPrivShowMsg('adminUserAdd');   
@@ -182,11 +187,9 @@ class Admin extends MY_Controller
             echoMsg(10004);
         }
     }
-    
+
     /**
      * 检查用户名是否存在
-     * @author  alan    2014.8.6
-     * @return  Json    true or false
      */
     function checkUserIsExist() 
     {
@@ -194,52 +197,62 @@ class Admin extends MY_Controller
        
        if($res)
        {
-            echo json_encode(false);
-       }else
+           jsonEcho(FALSE);
+       }
+       else
        {
-            echo json_encode(true);
+           jsonEcho(TRUE);
        }
     }
+
     /**
-     * 修改处理
-     * @author  alan    2014.7.22
-     */ 
+     * 管理员修改处理
+     */
     function update()
     {
         noPrivShowMsg('adminUserEdit');  
-        $this->form_validation->set_rules("username","用户名","trim|required|min_length[6]|max_length[18]");
-        $this->form_validation->set_rules("password","密码","trim|min_length[8]|max_length[18]");
+        $this->form_validation->set_rules(
+            "username","用户名","trim|required|min_length[6]|max_length[18]"
+        );
+        $this->form_validation->set_rules(
+            "password","密码","trim|min_length[8]|max_length[18]"
+        );
+
         if($this->form_validation->run()==FALSE)
 		{
 			echoMsg(validation_errors());
-		} 
+		}
+
         $res = $this->Admin_model->updateRecord();
         
         if($res == 2)
         {
             echoMsg(10010);
-        }elseif($res == 1)
+        }
+        elseif($res == 1)
         {
             echoMsg(10000, site_url(BACKEND_DIR_NAME.'/admin'), 'yes');
-        }else
+        }
+        else
         {
             echoMsg(10001);
         }
     }
-    
+
     /**
-     * 删除处理
-     * @author  alan    2014.7.22
-     */ 
+     * 管理员删除处理
+     */
     function delete()
     {
         noPrivShowMsg('adminUserDel');
 
         $res = $this->Admin_model->deleteRecord();
+
         if($res)
         {
             echoMsg(10005, site_url(BACKEND_DIR_NAME.'/admin'), 'yes');
-        }else
+        }
+        else
         {
             echoMsg(10006);
         }
