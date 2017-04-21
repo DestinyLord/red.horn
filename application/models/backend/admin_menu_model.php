@@ -157,7 +157,7 @@ class Admin_menu_model extends Core_model
         //如果更改了父ID ,就更新父ID的记录和自己的记录
 		if($parentId != $oldParentId)
 		{
-            $row   = $this->getMenuItem(['where' => ['id' => $parentId]]);
+            $row = $this->getMenuItem(['where' => ['id' => $parentId]]);
 
 			if(!empty($row))
 			{
@@ -212,9 +212,7 @@ class Admin_menu_model extends Core_model
 		}
 		else
         {
-            $this->db->update("admin_menu",$updateData,array('id'=>$id));
-            
-            $res = $this->db->affected_rows();//是否修改成功标识
+            $res = $this->update($this->_tableName, $updateData, ['id' => $id]);
         }
         
         if($res > 0)

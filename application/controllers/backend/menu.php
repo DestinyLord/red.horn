@@ -1,7 +1,7 @@
 <?php   if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Menu extends MY_Controller    
 {
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
         check_admin_is_login();
@@ -11,9 +11,9 @@ class Menu extends MY_Controller
 	
     /**
      * 菜单管理
-     * @author  alan    2014.7.22   
-     */ 
-	function index()
+     * @author  alan    2014.7.22
+     */
+	public function index()
 	{
         noPrivShowMsg('menuManage');
         $datas = $this->Admin_menu_model->getMenuItems();
@@ -25,7 +25,7 @@ class Menu extends MY_Controller
     /**
      * 菜单新增页面
      */
-    function add()
+    public function add()
     {
         noPrivShowMsg('menuAdd');
         $editData = [];
@@ -43,7 +43,7 @@ class Menu extends MY_Controller
      *
      * @param $id
      */
-    function edit($id)
+    public function edit($id)
     {
         noPrivShowMsg('menuEdit');
         $editData = [];
@@ -72,7 +72,7 @@ class Menu extends MY_Controller
      * 添加处理
      * @author  alan    2014.7.22
      */ 
-    function insert()
+    public function insert()
     {
         noPrivShowMsg('menuAdd'); 
         $this->form_validation->set_rules("menu_title","菜单名称","trim|required");
@@ -97,7 +97,7 @@ class Menu extends MY_Controller
     /**
      * 修改菜单操作
      */
-    function update()
+    public function update()
     {
         noPrivShowMsg('menuEdit');
         $this->form_validation->set_rules(
@@ -139,7 +139,7 @@ class Menu extends MY_Controller
     /**
      * 删除菜单操作
      */
-    function delete()
+    public function delete()
     {
         noPrivShowMsg('menuDel');
         $id     = intval($this->input->get('id'));

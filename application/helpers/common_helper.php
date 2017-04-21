@@ -88,7 +88,7 @@ function getMessage($msgCode)
  * @param $up_config
  * @return array
  */
-function do_upload($up_config)
+function doUpload($up_config)
 {
     if (is_array($up_config))
     {
@@ -114,7 +114,7 @@ function do_upload($up_config)
     $CI->load->library('upload');
     $CI->upload->initialize($config);
 
-    if (!$CI->upload->do_upload($form_name))
+    if (!$CI->upload->doUpload($form_name))
     {
         if (isset($_FILES[$form_name]['name']) && !empty($_FILES[$form_name]['name']))
         {
@@ -259,10 +259,10 @@ function getIP()
 /**
  * 判断管理员对某一个操作是否有权限
  *
- * @param $priv_str
+ * @param $privStr
  * @return bool
  */
-function check_priv($priv_str)
+function check_priv($privStr)
 {
     $CI = &get_instance();
     if (trim($CI->session->userdata('admin_action_list'), ',') == 'all')
@@ -270,7 +270,7 @@ function check_priv($priv_str)
         return true;
     }
 
-    if (strpos(',' . $CI->session->userdata('admin_action_list') . ',', ',' . $priv_str . ',') === false)
+    if (strpos(',' . $CI->session->userdata('admin_action_list') . ',', ',' . $privStr . ',') === false)
     {
         return false;
     }
@@ -287,7 +287,7 @@ function check_priv($priv_str)
  * @param   string  $authz
  * @return  boolean
  */
-function check_authz($authz)
+function checkAuthz($authz)
 {
     return (preg_match('/,*' . $authz . ',*/', $_SESSION['admin_action_list']) || $_SESSION['admin_action_list'] == 'all');
 }
@@ -416,7 +416,7 @@ function getBackendBreadCrumbs($breadCrumbsArr, $homeDirName = BACKEND_DIR_NAME)
  * @param $data
  * @return mixed
  */
-function do_post($url, $data)
+function doPost($url, $data)
 {
     if (empty($data))
         $data = array();
@@ -463,7 +463,7 @@ function unsetEmptyValueByArray($arr)
  * @param string $fileName
  * @return string
  */
-function createqrcode($url, $dirName = '', $fileName = '')
+function createQRcode($url, $dirName = '', $fileName = '')
 {
     $CI = &get_instance();
     $CI->load->library('qrcode');

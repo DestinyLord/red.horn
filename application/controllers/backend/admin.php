@@ -104,7 +104,7 @@ class Admin extends MY_Controller
         //头像上传处理
         if(isset($_FILES['avatar_path']))
         {
-            $uploadData = do_upload(
+            $uploadData = doUpload(
                 [
                     'up_path'   => UPLOAD_BASE_PATH.'admin/avatar/',
                     'form_name' => "avatar_path",
