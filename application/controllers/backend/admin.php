@@ -19,7 +19,7 @@ class Admin extends MY_Controller
 	function index()
 	{
         noPrivShowMsg('adminUserManage');
-        $datas = $this->Admin_model->getRecords();
+        $datas = $this->Admin_model->getAdminItems();
         $this->template->assign('datas' ,$datas);
         $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['admin']);//位置信息
         $this->template->display('index.tpl');
@@ -51,7 +51,7 @@ class Admin extends MY_Controller
         $this->template->assign('adminUserList' ,$adminUserList);
         
         //管理员角色
-        $adminRole = $this->Admin_role_model->getRecords();
+        $adminRole = $this->Admin_role_model->getRoleItems();
         $this->template->assign('adminRole' ,$adminRole);
         
         $this->template->assign('editData' ,$editData);
@@ -88,7 +88,7 @@ class Admin extends MY_Controller
         $this->template->assign('adminUserList' ,$adminUserList);//左边菜单的活动判断
         
         //管理员角色
-        $adminRole = $this->Admin_role_model->getRecords();
+        $adminRole = $this->Admin_role_model->getRoleItems();
         $this->template->assign('adminRole' ,$adminRole);
         
         $this->template->assign('editData' ,$editData);

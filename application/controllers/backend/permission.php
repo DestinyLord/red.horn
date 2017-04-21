@@ -173,7 +173,9 @@ class Permission extends MY_Controller
         elseif($type == 'role')
         {
             $this->load->model(BACKEND_MODEL_DIR_NAME.'/Admin_role_model');
-            $roleData = $this->Admin_role_model->getRecord($id);  
+            $roleData = $this->Admin_role_model->getRoleItem(
+                ['where' => ['id' => $id]]
+            );
             $curData = explode(',',$roleData['action_list']);       
         }
 

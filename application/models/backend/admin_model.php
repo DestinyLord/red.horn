@@ -91,7 +91,31 @@ class Admin_model extends Core_model
             return $result;
         }
     }
-    
+
+    /**
+     * 根据条件获取多个管理员数据
+     *
+     * @param bool $isTree
+     * @param array $params
+     * @return array
+     */
+    public function getAdminItems($isTree = TRUE, $params = [])
+    {
+        $params['order_by'] = 'admin_role_id, hits DESC, id DESC';
+
+        $data = $this->getItems(
+            $this->_tableName, '*', $params
+        );
+        $result = [];
+
+        print_r($data);
+        exit;
+
+        $this->getTreeMenu($data, 0, $result);
+
+        return $result;
+    }
+
     /**
      * 获取所有数据
      * @author  alan    2014.7.21

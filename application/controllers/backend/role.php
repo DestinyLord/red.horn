@@ -16,7 +16,7 @@ class Role extends MY_Controller
 	function index()
 	{
         noPrivShowMsg('roleManage');
-        $datas = $this->Admin_role_model->getRecords();
+        $datas = $this->Admin_role_model->getRoleItems();
         $this->template->assign('datas' ,$datas);
         $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['role']);//位置信息
         $this->template->display('index.tpl');
@@ -57,7 +57,9 @@ class Role extends MY_Controller
         }
         if($id)
         {
-            $editData = $this->Admin_role_model->getRecord($id);
+            $editData = $this->Admin_role_model->getRoleItem(
+                ['where' => ['id' => $id]]
+            );
         }else
         {
             echoMsg(10002);
