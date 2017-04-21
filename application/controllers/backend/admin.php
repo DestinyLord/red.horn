@@ -193,16 +193,10 @@ class Admin extends MY_Controller
      */
     function checkUserIsExist() 
     {
-       $res = $this->Admin_model->checkUserIsExist();
-       
-       if($res)
-       {
-           jsonEcho(FALSE);
-       }
-       else
-       {
-           jsonEcho(TRUE);
-       }
+        $id       = $this->input->post('id');
+        $userName = $this->input->post('username');
+        $res      = $this->Admin_model->checkUserIsExist($id, $userName);
+        jsonEcho($res);
     }
 
     /**
@@ -210,7 +204,7 @@ class Admin extends MY_Controller
      */
     function update()
     {
-        noPrivShowMsg('adminUserEdit');  
+        noPrivShowMsg('adminUserEdit');
         $this->form_validation->set_rules(
             "username","用户名","trim|required|min_length[6]|max_length[18]"
         );
