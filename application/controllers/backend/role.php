@@ -17,8 +17,8 @@ class Role extends MY_Controller
 	{
         noPrivShowMsg('roleManage');
         $datas = $this->Admin_role_model->getRoleItems();
-        $this->template->assign('datas' ,$datas);
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['role']);//位置信息
+        $this->template->assign('datas', $datas);
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['role']);//位置信息
         $this->template->display('index.tpl');
 	}
     
@@ -32,9 +32,9 @@ class Role extends MY_Controller
         $editData = array();
         
         
-        $this->template->assign('editData' ,$editData);
-        $this->template->assign('formAction' ,site_url(BACKEND_DIR_NAME.'/role/insert'));
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['role_add']);//位置信息
+        $this->template->assign('editData', $editData);
+        $this->template->assign('formAction', site_url(BACKEND_DIR_NAME.'/role/insert'));
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['role_add']);//位置信息
         $this->template->display('info.tpl');
     }
     
@@ -66,9 +66,9 @@ class Role extends MY_Controller
         }   
         
         
-        $this->template->assign('editData' ,$editData);
-        $this->template->assign('formAction' ,site_url(BACKEND_DIR_NAME.'/role/update'));
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['role_edit']);//位置信息
+        $this->template->assign('editData', $editData);
+        $this->template->assign('formAction', site_url(BACKEND_DIR_NAME.'/role/update'));
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['role_edit']);//位置信息
         $this->template->display('info.tpl');
     }
     
@@ -90,10 +90,10 @@ class Role extends MY_Controller
         $res = $this->Admin_role_model->insertRecord();
         if($res)
         {
-            echoMsg(10003 ,site_url(BACKEND_DIR_NAME.'/role') ,'yes');
+            echoMsg(10003, site_url(BACKEND_DIR_NAME.'/role'), 'yes');
         }else
         {
-            echoMsg(10004 );
+            echoMsg(10004);
         }
     }
     
@@ -114,10 +114,10 @@ class Role extends MY_Controller
         $res = $this->Admin_role_model->updateRecord();
         if($res)
         {
-            echoMsg(10000 ,site_url(BACKEND_DIR_NAME.'/role') ,'yes');
+            echoMsg(10000, site_url(BACKEND_DIR_NAME.'/role'), 'yes');
         }else
         {
-            echoMsg(10001 );
+            echoMsg(10001);
         }
     }
     
