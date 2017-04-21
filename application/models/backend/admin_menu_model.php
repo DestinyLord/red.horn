@@ -25,11 +25,37 @@ class Admin_menu_model extends Core_model
     {
         $params['order_by'] = 'seqorder ASC';
 
-        $result = $this->getItems(
+        $data   = $this->getItems(
             $this->_tableName, '*', $params
         );
+        $result = [];
+
+        $this->getTreeMenu($data, 0, $result);
 
         return $result;
+    }
+
+    /**
+     * 递归获取菜单数组
+     *
+     * @param $data
+     * @param $pid
+     * @param $result
+     */
+    private function getTreeMenu($data, $pid, &$result)
+    {
+        array_map(function($item) use (&$result, $pid, $data)
+        {
+            if ($item['parent_id'] == $pid)
+            {
+                $result[] = $item;
+
+                if($item['has_child'] == 1)
+                {
+                    $this->getTreeMenu($data, $item['id'], $result);
+                }
+            }
+        }, $data);
     }
 
     /**
