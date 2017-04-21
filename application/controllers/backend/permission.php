@@ -54,7 +54,7 @@ class Permission extends MY_Controller
             $editData = $this->Admin_action_model->getRecord($id);
         }else
         {
-            echo_msg(10002);
+            echoMsg(10002);
         }   
         
         $permissionList = $this->Admin_action_model->getRecords();
@@ -76,15 +76,15 @@ class Permission extends MY_Controller
         $this->form_validation->set_rules("action_title","权限名称","trim|required");
         if($this->form_validation->run()==FALSE)
 		{
-			echo_msg(validation_errors());
+			echoMsg(validation_errors());
 		}    
         $res = $this->Admin_action_model->insertRecord();
         if($res)
         {
-            echo_msg(10003 ,site_url(BACKEND_DIR_NAME.'/permission') ,'yes');
+            echoMsg(10003 ,site_url(BACKEND_DIR_NAME.'/permission') ,'yes');
         }else
         {
-            echo_msg(10004 );
+            echoMsg(10004 );
         }
     }
     
@@ -98,15 +98,15 @@ class Permission extends MY_Controller
         $this->form_validation->set_rules("action_title","权限名称","trim|required");
         if($this->form_validation->run()==FALSE)
 		{
-			echo_msg(validation_errors());
+			echoMsg(validation_errors());
 		}    
         $res = $this->Admin_action_model->updateRecord();
         if($res)
         {
-            echo_msg(10000 ,site_url(BACKEND_DIR_NAME.'/permission') ,'yes');
+            echoMsg(10000 ,site_url(BACKEND_DIR_NAME.'/permission') ,'yes');
         }else
         {
-            echo_msg(10001 );
+            echoMsg(10001 );
         }
     }
     
@@ -120,10 +120,10 @@ class Permission extends MY_Controller
         $res = $this->Admin_action_model->deleteRecord();
         if($res)
         {
-            echo_msg(10005, site_url(BACKEND_DIR_NAME.'/permission'), 'yes');
+            echoMsg(10005, site_url(BACKEND_DIR_NAME.'/permission'), 'yes');
         }else
         {
-            echo_msg(10006);
+            echoMsg(10006);
         }
     }
     
@@ -138,7 +138,7 @@ class Permission extends MY_Controller
         noPrivShowMsg('assignPriv');
         if(empty($type) || ($type != 'admin_user' && $type != 'role') || empty($id))
         {
-            echo_msg(10007);
+            echoMsg(10007);
         }
         
         if($type == 'admin_user')
@@ -159,7 +159,7 @@ class Permission extends MY_Controller
                 }
                 if(!in_array($id ,$idArr))
                 {
-                    echo_msg(10007);
+                    echoMsg(10007);
                 }
             }
             //检查 END
@@ -212,15 +212,15 @@ class Permission extends MY_Controller
         {
             if($type == 'admin_user')
             {
-                echo_msg(10011, site_url(BACKEND_DIR_NAME.'/admin'), 'yes');
+                echoMsg(10011, site_url(BACKEND_DIR_NAME.'/admin'), 'yes');
             }else
             {
-                echo_msg(10011, site_url(BACKEND_DIR_NAME.'/role'), 'yes');
+                echoMsg(10011, site_url(BACKEND_DIR_NAME.'/role'), 'yes');
             }
             
         }else
         {
-            echo_msg(10012);
+            echoMsg(10012);
         }
     }
     

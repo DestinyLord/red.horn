@@ -70,7 +70,7 @@ class Admin extends MY_Controller
         noPrivShowMsg('adminUserEdit');
         if($id == 1 && !checkIsAdmin())
         {
-            echo_msg(10008);
+            echoMsg(10008);
         }
         $this->load->model(BACKEND_MODEL_DIR_NAME.'/Admin_role_model');
         $editData = array();
@@ -79,7 +79,7 @@ class Admin extends MY_Controller
             $editData = $this->Admin_model->getRecord($id);
         }else
         {
-            echo_msg(10002);
+            echoMsg(10002);
         }   
         
         $adminUserList = $this->Admin_model->getRecords();
@@ -114,7 +114,7 @@ class Admin extends MY_Controller
 
             if(!$uploadData['status'])
     		{
-    			echo_msg($uploadData['upload_errors']);
+    			echoMsg($uploadData['upload_errors']);
     		}
             
             if($uploadData['file_path'])
@@ -134,11 +134,11 @@ class Admin extends MY_Controller
                 $redirect = '';
             }
 
-            echo_msg(10000, $redirect, 'yes');
+            echoMsg(10000, $redirect, 'yes');
         }
         else
         {
-            echo_msg(10001);
+            echoMsg(10001);
         }
     }
     
@@ -163,21 +163,21 @@ class Admin extends MY_Controller
 
 		if($this->form_validation->run()==FALSE)
 		{
-			echo_msg(validation_errors());
+			echoMsg(validation_errors());
 		}
         $res = $this->Admin_model->insertRecord();
 
         if($res == 2)
         {
-            echo_msg(10010);
+            echoMsg(10010);
         }
         elseif($res == 1)
         {
-            echo_msg(10003, site_url(BACKEND_DIR_NAME.'/admin'), 'yes');
+            echoMsg(10003, site_url(BACKEND_DIR_NAME.'/admin'), 'yes');
         }
         elseif($res == 0)
         {
-            echo_msg(10004);
+            echoMsg(10004);
         }
     }
     
@@ -209,19 +209,19 @@ class Admin extends MY_Controller
         $this->form_validation->set_rules("password","密码","trim|min_length[8]|max_length[18]");
         if($this->form_validation->run()==FALSE)
 		{
-			echo_msg(validation_errors());
+			echoMsg(validation_errors());
 		} 
         $res = $this->Admin_model->updateRecord();
         
         if($res == 2)
         {
-            echo_msg(10010);
+            echoMsg(10010);
         }elseif($res == 1)
         {
-            echo_msg(10000, site_url(BACKEND_DIR_NAME.'/admin'), 'yes');
+            echoMsg(10000, site_url(BACKEND_DIR_NAME.'/admin'), 'yes');
         }else
         {
-            echo_msg(10001);
+            echoMsg(10001);
         }
     }
     
@@ -236,10 +236,10 @@ class Admin extends MY_Controller
         $res = $this->Admin_model->deleteRecord();
         if($res)
         {
-            echo_msg(10005, site_url(BACKEND_DIR_NAME.'/admin'), 'yes');
+            echoMsg(10005, site_url(BACKEND_DIR_NAME.'/admin'), 'yes');
         }else
         {
-            echo_msg(10006);
+            echoMsg(10006);
         }
     }
 }

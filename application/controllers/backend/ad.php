@@ -73,7 +73,7 @@ class Ad extends MY_Controller
             $editData = $this->Ad_model->getRecord($id);
         }else
         {
-            echo_msg(10002);
+            echoMsg(10002);
         }
         if(empty($editData))
         {
@@ -113,15 +113,15 @@ class Ad extends MY_Controller
 
 		if($this->form_validation->run()==FALSE)
 		{
-			echo_msg(validation_errors());
+			echoMsg(validation_errors());
 		}
         $res = $this->Ad_model->insertRecord();
         if($res)
         {
-            echo_msg(10003, site_url(BACKEND_DIR_NAME.'/ad'), 'yes');
+            echoMsg(10003, site_url(BACKEND_DIR_NAME.'/ad'), 'yes');
         }else
         {
-            echo_msg(10004 );
+            echoMsg(10004 );
         }
     }
     
@@ -139,16 +139,16 @@ class Ad extends MY_Controller
         $this->form_validation->set_rules("height","广告宽度","trim|required|is_natural_no_zero");
         if($this->form_validation->run()==FALSE)
 		{
-			echo_msg(validation_errors());
+			echoMsg(validation_errors());
 		}
         //echo '<pre>';print_r($this->session->userdata('uploadData'));exit; 
         $res = $this->Ad_model->updateRecord();
         if($res)
         {
-            echo_msg(10000, site_url(BACKEND_DIR_NAME.'/ad'), 'yes');
+            echoMsg(10000, site_url(BACKEND_DIR_NAME.'/ad'), 'yes');
         }else
         {
-            echo_msg(10001);
+            echoMsg(10001);
         }
     }
     
@@ -162,10 +162,10 @@ class Ad extends MY_Controller
         $res = $this->Ad_model->deleteRecord();
         if($res)
         {
-            echo_msg(10005, site_url(BACKEND_DIR_NAME.'/ad'), 'yes');
+            echoMsg(10005, site_url(BACKEND_DIR_NAME.'/ad'), 'yes');
         }else
         {
-            echo_msg(10006);
+            echoMsg(10006);
         }
     }
 

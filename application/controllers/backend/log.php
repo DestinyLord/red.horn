@@ -40,10 +40,10 @@ class Log extends MY_Controller
         $res = $this->Admin_model->deleteRecord();
         if($res)
         {
-            echo_msg(10005, site_url(BACKEND_DIR_NAME.'/admin'), 'yes');
+            echoMsg(10005, site_url(BACKEND_DIR_NAME.'/admin'), 'yes');
         }else
         {
-            echo_msg(10006);
+            echoMsg(10006);
         }
     }
 }

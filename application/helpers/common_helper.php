@@ -38,7 +38,7 @@ function check_admin_is_login()
  * @param string $rdr
  * @param string $infotype
  */
-function echo_msg($msgCode, $rdr = '', $infotype = 'no')
+function echoMsg($msgCode, $rdr = '', $infotype = 'no')
 {
     if (empty($rdr))
     {
@@ -320,7 +320,7 @@ function noPrivShowMsg($actionCode)
 {
     if (!check_priv($actionCode))
     {
-        echo_msg(10009);
+        echoMsg(10009);
     }
 }
 

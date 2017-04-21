@@ -50,7 +50,7 @@ class Admin_menu_model extends Core_model
             {
                 $result[] = $item;
 
-                if($item['has_child'] == 1)
+                if(!empty($item['has_child']))
                 {
                     $this->getTreeMenu($data, $item['id'], $result);
                 }
@@ -82,59 +82,69 @@ class Admin_menu_model extends Core_model
     /**
      * 新增菜单操作
      *
+     * @param $parentId
+     * @param $menuTitle
+     * @param $insertData
      * @return bool
      */
-    function insertMenu()
+    function insertMenu($parentId, $menuTitle, $insertData)
 	{
-	   $parent_id = $this->input->post('parent_id');
-       $menuTitle = $this->input->post('menu_title');
-	   $options = array(
-                'parent_id'     => $parent_id,
-                'menu_title'    => $menuTitle,
-                'icon_class'    => $this->input->post('icon_class'),
-                'menu_url'      => $this->input->post('menu_url'),
-                'action_code'   => $this->input->post('action_code'),
-                'seqorder'      => $this->input->post('seqorder'),
-                'has_child'     => 0,
+	    $isExist = $this->getTotals(
+	        $this->_tableName, ['where' => ['menu_title' => $menuTitle]]
         );
-		$this->db->insert("admin_menu",$options);
-        
-		if($this->db->affected_rows())
+
+	    if ($isExist > 0)
+        {
+            echoMsg(10015);
+        }
+
+        $insertId = $this->insert($this->_tableName, $insertData);
+
+		if (!empty($insertId))
 		{
-			$max_id = $this->db->insert_id();
-			if($parent_id)
+			if ($parentId)
 			{
-				$query=$this->db->get_where("admin_menu",array('id'=>$parent_id));
-				if($query->num_rows()>0)
+			    $parentData = $this->getMenuItem(
+			        ['where' => ['id' => $parentId]]
+                );
+
+				if(!empty($parentData))
 				{
-					$row=$query->row_array();
-					$level=(int)$row['level']+1;
-					$queue=$row['queue'].$max_id.",";
+					$level = (int)$parentData['level'] + 1;
+					$queue = $parentData['queue'] . $insertId . ",";
+
+					// 若原父菜单无子菜单，则更新父菜单
+					if (empty($parentData['has_child']))
+                    {
+                        $this->update(
+                            $this->_tableName, ['has_child' => 1], ['id' => $parentId]
+                        );
+                    }
 				}
+				else
+                {
+                    echoMsg(10016);
+                    return FALSE;
+                }
 			}
 			else
 			{
-				$level=0;
-				$queue=",".$max_id.",";
+				$level = 0;
+				$queue = "," . $insertId . ",";
 			}
-			$data=array(
-				'queue'=>$queue,
-				'level'=>$level
-			);
-			$this->db->update("admin_menu",$data,array('id'=>$max_id));
-            
-			if($parent_id)
-			{
-				$data=array('has_child'=>1);
-				$this->db->update("admin_menu",$data,array('id'=>$parent_id));
-			}
+
+			$updateData = [
+				'queue' => $queue, 'level' => $level
+			];
+			$this->update($this->_tableName, $updateData, ['id' => $insertId]);
+
             // 添加操作日志
             $this->load->model(BACKEND_MODEL_DIR_NAME . '/Admin_log_model');
             $this->Admin_log_model->setAdminLog(
                 '添加菜单：'.$menuTitle
             );
 
-			return TRUE;	
+			return TRUE;
 		}
 		else
 		{
@@ -154,6 +164,22 @@ class Admin_menu_model extends Core_model
      */
     function updateMenu($id, $menuTitle, $parentId, $oldParentId, $updateData)
 	{
+	    // 判断菜单名称是否已经存在
+        $isExist = $this->getTotals(
+            $this->_tableName,
+            [
+                'where' => [
+                    'menu_title' => $menuTitle,
+                    'id !='      => $id
+                ]
+            ]
+        );
+
+        if ($isExist > 0)
+        {
+            echoMsg(10015);
+        }
+
         //如果更改了父ID ,就更新父ID的记录和自己的记录
 		if($parentId != $oldParentId)
 		{

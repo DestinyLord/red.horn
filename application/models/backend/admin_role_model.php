@@ -113,7 +113,7 @@ class Admin_role_model extends Core_model
 
         if($id == 1 && !checkIsAdmin())
         {
-            echo_msg(10008);
+            echoMsg(10008);
         }
 
         $roleName = $this->input->post('role_name');
@@ -158,14 +158,14 @@ class Admin_role_model extends Core_model
         {
             if(in_array(1, $ids))
             {
-                echo_msg(10008);
+                echoMsg(10008);
             }
             $where .= ' id IN ('.implode(',' ,$ids).')';
         }else
         {
             if($ids == 1)
             {
-                echo_msg(10008);
+                echoMsg(10008);
             }
             $where .= ' id = '.$ids;
         }

@@ -56,7 +56,7 @@ class Menu extends MY_Controller
         }
         else
         {
-            echo_msg(10002);
+            echoMsg(10002);
         }   
         
         $menuList = $this->Admin_menu_model->getMenuItems();
@@ -79,18 +79,31 @@ class Menu extends MY_Controller
 
         if($this->form_validation->run()==FALSE)
 		{
-			echo_msg(validation_errors());
+			echoMsg(validation_errors());
 		}
 
-        $res = $this->Admin_menu_model->insertMenu();
+        $parentId  = $this->input->post('parent_id');
+        $menuTitle = $this->input->post('menu_title');
+        $options   = [
+            'parent_id'   => $parentId,
+            'menu_title'  => $menuTitle,
+            'icon_class'  => $this->input->post('icon_class'),
+            'menu_url'    => $this->input->post('menu_url'),
+            'action_code' => $this->input->post('action_code'),
+            'seqorder'    => $this->input->post('seqorder'),
+            'has_child'   => 0,
+        ];
+        $res       = $this->Admin_menu_model->insertMenu(
+            $parentId, $menuTitle, $options
+        );
 
         if($res)
         {
-            echo_msg(10003 ,site_url(BACKEND_DIR_NAME.'/menu') ,'yes');
+            echoMsg(10003 ,site_url(BACKEND_DIR_NAME.'/menu') ,'yes');
         }
         else
         {
-            echo_msg(10004 );
+            echoMsg(10004 );
         }
     }
 
@@ -106,7 +119,7 @@ class Menu extends MY_Controller
 
         if($this->form_validation->run()==FALSE)
 		{
-			echo_msg(validation_errors());
+			echoMsg(validation_errors());
 		}
 
         $id          = $this->input->post("id");
@@ -128,11 +141,11 @@ class Menu extends MY_Controller
 
         if($res)
         {
-            echo_msg(10000, site_url(BACKEND_DIR_NAME.'/menu'), 'yes');
+            echoMsg(10000, site_url(BACKEND_DIR_NAME.'/menu'), 'yes');
         }
         else
         {
-            echo_msg(10001);
+            echoMsg(10001);
         }
     }
 
@@ -149,7 +162,7 @@ class Menu extends MY_Controller
 
         if (!empty($isUsed))
         {
-            echo_msg(10014);
+            echoMsg(10014);
         }
         else
         {
@@ -157,11 +170,11 @@ class Menu extends MY_Controller
 
             if($res)
             {
-                echo_msg(10005, site_url(BACKEND_DIR_NAME.'/menu'), 'yes');
+                echoMsg(10005, site_url(BACKEND_DIR_NAME.'/menu'), 'yes');
             }
             else
             {
-                echo_msg(10006);
+                echoMsg(10006);
             }
         }
     }

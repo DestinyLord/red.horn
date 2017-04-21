@@ -47,20 +47,20 @@ class Role extends MY_Controller
     {
         if($id == 1 && !checkIsAdmin())
         {
-            echo_msg(10008);
+            echoMsg(10008);
         }
         noPrivShowMsg('roleEdit');
         $editData = array();
         if($id == 1)
         {
-            echo_msg(10007);
+            echoMsg(10007);
         }
         if($id)
         {
             $editData = $this->Admin_role_model->getRecord($id);
         }else
         {
-            echo_msg(10002);
+            echoMsg(10002);
         }   
         
         
@@ -82,16 +82,16 @@ class Role extends MY_Controller
         
         if($this->form_validation->run()==FALSE)
 		{
-			echo_msg(validation_errors());
+			echoMsg(validation_errors());
 		} 
          
         $res = $this->Admin_role_model->insertRecord();
         if($res)
         {
-            echo_msg(10003 ,site_url(BACKEND_DIR_NAME.'/role') ,'yes');
+            echoMsg(10003 ,site_url(BACKEND_DIR_NAME.'/role') ,'yes');
         }else
         {
-            echo_msg(10004 );
+            echoMsg(10004 );
         }
     }
     
@@ -106,16 +106,16 @@ class Role extends MY_Controller
         
         if($this->form_validation->run()==FALSE)
 		{
-			echo_msg(validation_errors());
+			echoMsg(validation_errors());
 		}
         
         $res = $this->Admin_role_model->updateRecord();
         if($res)
         {
-            echo_msg(10000 ,site_url(BACKEND_DIR_NAME.'/role') ,'yes');
+            echoMsg(10000 ,site_url(BACKEND_DIR_NAME.'/role') ,'yes');
         }else
         {
-            echo_msg(10001 );
+            echoMsg(10001 );
         }
     }
     
@@ -130,10 +130,10 @@ class Role extends MY_Controller
         $res = $this->Admin_role_model->deleteRecord();
         if($res)
         {
-            echo_msg(10005, site_url(BACKEND_DIR_NAME.'/role'), 'yes');
+            echoMsg(10005, site_url(BACKEND_DIR_NAME.'/role'), 'yes');
         }else
         {
-            echo_msg(10006);
+            echoMsg(10006);
         }
     }
 }

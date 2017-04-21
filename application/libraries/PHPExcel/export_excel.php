@@ -77,7 +77,7 @@ class Export_excel
         if (!is_object($query) || !method_exists($query, 'list_fields'))
         {
             //这里的错误提示根据需要修改
-            echo_msg(10013);
+            echoMsg(10013);
         }
         $contentArr[0] = $query->list_fields();
         $result        = $query->result_array();

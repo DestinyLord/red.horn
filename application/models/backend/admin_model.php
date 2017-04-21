@@ -327,7 +327,7 @@ class Admin_model extends Core_model
         
         if($id == 1 && !checkIsAdmin())
         {
-            echo_msg(10008);
+            echoMsg(10008);
         }
 
         $userData = $this->getRecord($id);//修改的用户信息
@@ -335,7 +335,7 @@ class Admin_model extends Core_model
         $parentIdArr = explode(',' ,trim($userData['queue'] ,','));
         if(!in_array($this->session->userdata('admin_id') ,$parentIdArr) && $this->session->userdata('admin_id') != 1)
         {
-            echo_msg(10002);
+            echoMsg(10002);
         }
         if($username != $oldUsername)//如果用户名有变动，才检查这个用户名是否存在
         {
@@ -531,14 +531,14 @@ class Admin_model extends Core_model
         {
             if(in_array(1, $ids))
             {
-                echo_msg(10008);
+                echoMsg(10008);
             }
             $where .= ' id IN ('.implode(',' ,$ids).')';
         }else
         {
             if($ids == 1)
             {
-                echo_msg(10008);
+                echoMsg(10008);
             }
             $where .= ' id = '.$ids;
         }
