@@ -76,7 +76,9 @@ class Admin extends MY_Controller
         $editData = array();
         if($id)
         {
-            $editData = $this->Admin_model->getRecord($id);
+            $editData = $this->Admin_model->getAdminItem(
+                ['where' => ['id' => $id]]
+            );
         }else
         {
             echoMsg(10002);

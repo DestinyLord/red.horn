@@ -70,6 +70,27 @@ class Admin_model extends Core_model
 		}
 		
 	}
+
+    /**
+     * 根据条件获取某个管理员数据
+     *
+     * @param $params
+     * @param string $keyWord
+     * @return array
+     */
+    public function getAdminItem($params, $keyWord = '')
+    {
+        $result = $this->getItem($this->_tableName, $params);
+
+        if (!empty($result) && !empty($keyWord) && isset($result[$keyWord]))
+        {
+            return $result[$keyWord];
+        }
+        else
+        {
+            return $result;
+        }
+    }
     
     /**
      * 获取所有数据
@@ -117,45 +138,6 @@ class Admin_model extends Core_model
         }
 		return $records;
 	}
-    
-    /**
-     * 获取一条菜单记录
-     * @author  alan    2014.7.21
-     * @param   $id     INT     表ID 
-     * @return  Array OR false   一维数组或False
-     */ 
-    function getRecord($id)
-	{
-		$query = $this->db->get_where('admin',array('id'=>$id));
-        if($query->num_rows() > 0)
-        {
-            return $query->row_array();
-        }else
-        {
-            return false;
-        }
-	}
-
-    /**
-     * 根据条件获取某个管理员数据
-     *
-     * @param $params
-     * @param string $keyWord
-     * @return array
-     */
-    public function getAdminItem($params, $keyWord = '')
-    {
-        $result = $this->getItem($this->_tableName, $params);
-
-        if (!empty($result) && !empty($keyWord) && isset($result[$keyWord]))
-        {
-            return $result[$keyWord];
-        }
-        else
-        {
-            return $result;
-        }
-    }
 
     /**
      * 获取用户信息
@@ -200,7 +182,9 @@ class Admin_model extends Core_model
      */
     function checkPasswordIsRight($password) 
     {
-        $admin = $this->getRecord($this->session->userdata('admin_id'));
+        $admin = $this->Admin_model->getAdminItem(
+            ['where' => ['id' => $this->session->userdata('admin_id')]]
+        );
         
         if(md5($admin['salt'].$password) == $admin['password'])
         {
@@ -330,7 +314,10 @@ class Admin_model extends Core_model
             echoMsg(10008);
         }
 
-        $userData = $this->getRecord($id);//修改的用户信息
+        //修改的用户信息
+        $userData = $this->getAdminItem(
+            ['where' => ['id' => $id]]
+        );
         //检查这个操作人是否是这条记录的上级，不然，没资格修改
         $parentIdArr = explode(',' ,trim($userData['queue'] ,','));
         if(!in_array($this->session->userdata('admin_id') ,$parentIdArr) && $this->session->userdata('admin_id') != 1)

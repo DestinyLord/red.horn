@@ -163,9 +163,14 @@ class Permission extends MY_Controller
                 }
             }
             //检查 END
-            $userData = $this->Admin_model->getRecord($id);//获取要分派的人的信息
-            $curData = explode(',',$userData['action_list']);   
-        }else if($type == 'role')
+
+            // 获取要分派的人的信息
+            $userData = $this->Admin_model->getAdminItem(
+                ['where' => ['id' => $id]]
+            );
+            $curData  = explode(',',$userData['action_list']);
+        }
+        elseif($type == 'role')
         {
             $this->load->model(BACKEND_MODEL_DIR_NAME.'/Admin_role_model');
             $roleData = $this->Admin_role_model->getRecord($id);  
