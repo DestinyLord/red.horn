@@ -16,7 +16,7 @@ class Admin_role_model extends Core_model
 	}
 
     /**
-     * 根据条件获取某个权限数据
+     * 根据条件获取某个角色数据
      *
      * @param array $params
      * @param string $keyWord
@@ -37,7 +37,7 @@ class Admin_role_model extends Core_model
     }
 
     /**
-     * 根据条件获取多个权限数据，除了超级管理员
+     * 根据条件获取多个角色数据，除了超级管理员
      *
      * @param array $params
      * @return array
@@ -54,28 +54,39 @@ class Admin_role_model extends Core_model
 
         return $result;
     }
-    
+
     /**
-     * 插入记录
-     * @author  alan    2014.7.21
-     * @return  INT OR Boolean   插入的新ID 或 FALSE
-     */ 
-    function insertRecord()
+     * 新增角色操作
+     *
+     * @param $insertData
+     * @return bool
+     */
+    function insertRole($insertData)
 	{
-	   $roleName = $this->input->post('role_name');
-	   $options = array(
-                'role_name'    => $roleName,
-                'role_code'    => $this->input->post('role_code'),
-                'role_describe'      => $this->input->post('role_describe'),
+        // 判断权限名称或者CODE是否已存在
+        $isExist = $this->getTotals(
+            $this->_tableName,
+            [
+                'or_where' => [
+                    'role_name' => $insertData['role_name'],
+                    'role_code' => $insertData['role_code'],
+                ]
+            ]
         );
-		$this->db->insert("admin_role",$options);
+
+        if ($isExist > 0)
+        {
+            echoMsg(10017);
+        }
+
+	    $result = $this->insert($this->_tableName, $insertData);
         
-		if($this->db->affected_rows())
+		if(!empty($result))
 		{
             // 添加操作日志
             $this->load->model(BACKEND_MODEL_DIR_NAME . '/Admin_log_model');
             $this->Admin_log_model->setAdminLog(
-                '添加角色：'.$roleName
+                '添加角色：' . $insertData['role_name']
             );
 			return TRUE;
 		}
@@ -84,102 +95,67 @@ class Admin_role_model extends Core_model
 			return FALSE;
 		}
 	}
-    
-    /**
-     * 更改记录
-     * @author  alan    2014.7.22
-     * @return  Boolean   TRUE 或 FALSE
-     */
-    function updateRecord()
-	{
-		$id=$this->input->post("id");
 
+    /**
+     * 修改角色操作
+     *
+     * @param $id
+     * @param $updateData
+     * @return bool
+     */
+    function updateRole($id, $updateData)
+	{
         if($id == 1 && !checkIsAdmin())
         {
             echoMsg(10008);
         }
 
-        $roleName = $this->input->post('role_name');
-        $options = array(
-                'role_name'    => $roleName,
-                'role_code'    => $this->input->post('role_code'),
-                'role_describe'      => $this->input->post('role_describe'),
-        );
-        
-        
-        $this->db->update("admin_role",$options,array('id'=>$id));
-        
-        $res = $this->db->affected_rows();// 是否修改成功标识
-        
+        // 判断权限名称或者CODE是否已存在
+        $isExistSQL = "SELECT id FROM " . DBPREFIX . $this->_tableName .
+            " WHERE `id` != {$id} AND" .
+            " (role_code = '{$updateData['role_code']}' OR role_name = '{$updateData['role_name']}')";
+        $isExist    = $this->db->query($isExistSQL)->num_rows();
+
+        if ($isExist > 0)
+        {
+            echoMsg(10017);
+        }
+
+        $result = $this->update($this->_tableName, $updateData, ['id' => $id]);
   
-        if($res > 0)
+        if($result > 0)
         {
             // 添加操作日志
             $this->load->model(BACKEND_MODEL_DIR_NAME . '/Admin_log_model');
             $this->Admin_log_model->setAdminLog(
-                '修改角色：'.$roleName
+                '修改角色：' . $updateData['role_name']
             );
             return TRUE;
-        }else
+        }
+        else
         {
             return FALSE;
         }
 		
 	}
-    
-    
-    /**
-     * 删除记录
-     * @author  alan    2014.7.22
-     */
-    function deleteRecord()
-    {
-        $ids = intval($this->input->get('id'));
-        
-        $where = '';
-        if(is_array($ids))
-        {
-            if(in_array(1, $ids))
-            {
-                echoMsg(10008);
-            }
-            $where .= ' id IN ('.implode(',', $ids).')';
-        }else
-        {
-            if($ids == 1)
-            {
-                echoMsg(10008);
-            }
-            $where .= ' id = '.$ids;
-        }
-        $query = $this->db->query('SELECT * FROM '.DBPREFIX.'admin_role WHERE '.$where); 
-        if($query->num_rows() > 0)
-        {
-            if(is_array($ids))
-            {
-                $data = $query->result_array();
-            }else
-            {
-                $data = $query->row_array();
-            }
-        }
 
-        $deleteSql = 'DELETE FROM '.DBPREFIX.'admin_role WHERE '.$where;
-        $this->db->query($deleteSql);
-        if($this->db->affected_rows() > 0)
+
+    /**
+     * 删除角色操作
+     *
+     * @param $id
+     * @return bool
+     */
+    function deleteRole($id)
+    {
+        $data   = $this->getRoleItem(['where' => ['id' => $id]]);
+        $result = FALSE;
+
+        if (!empty($data))
         {
-            if(is_array($ids)) // 如果是批量删除
-            {
-                foreach($data as $v)
-                {
-                    // 添加操作日志
-                    $this->load->model(BACKEND_MODEL_DIR_NAME . '/Admin_log_model');
-                    $this->Admin_log_model->setAdminLog(
-                        '批量删除角色：'.$v['role_name']
-                    );
-                }
-            }
-            else
+            $result = $this->delete($this->_tableName, ['id' => $id]);
+
+            if (!empty($result))
             {
                 // 添加操作日志
                 $this->load->model(BACKEND_MODEL_DIR_NAME . '/Admin_log_model');
@@ -187,11 +163,9 @@ class Admin_role_model extends Core_model
                     '删除角色：'.$data['role_name']
                 );
             }
-            return TRUE;
-        }else
-        {
-            return FALSE;
         }
+
+        return $result;
     } 
 
 }

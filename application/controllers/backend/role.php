@@ -21,28 +21,25 @@ class Role extends MY_Controller
         $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['role']);//位置信息
         $this->template->display('index.tpl');
 	}
-    
+
     /**
-     * 添加页面
-     * @author  alan    2014.7.22   
-     */ 
+     * 角色新增页面
+     */
     function add()
     {
         noPrivShowMsg('roleAdd');
-        $editData = array();
-        
-        
+        $editData = [];
         $this->template->assign('editData', $editData);
         $this->template->assign('formAction', site_url(BACKEND_DIR_NAME.'/role/insert'));
         $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['role_add']);//位置信息
         $this->template->display('info.tpl');
     }
-    
+
     /**
-     * 修改页面
-     * @author  alan    2014.7.22
-     * @param   $id     INT     表ID     
-     */ 
+     * 角色修改页面
+     *
+     * @param $id
+     */
     function edit($id)
     {
         if($id == 1 && !checkIsAdmin())
@@ -71,36 +68,40 @@ class Role extends MY_Controller
         $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['role_edit']);//位置信息
         $this->template->display('info.tpl');
     }
-    
+
     /**
-     * 添加处理
-     * @author  alan    2014.7.22
-     */ 
+     * 新增角色操作
+     */
     function insert()
     {
-        noPrivShowMsg('roleAdd'); 
-        
+        noPrivShowMsg('roleAdd');
         $this->form_validation->set_rules("role_name","角色名称","trim|required"); 
         
-        if($this->form_validation->run()==FALSE)
+        if($this->form_validation->run() == FALSE)
 		{
 			echoMsg(validation_errors());
-		} 
-         
-        $res = $this->Admin_role_model->insertRecord();
+		}
+
+        $insertData = [
+            'role_name'     => $this->input->post('role_name'),
+            'role_code'     => $this->input->post('role_code'),
+            'role_describe' => $this->input->post('role_describe'),
+        ];
+        $res        = $this->Admin_role_model->insertRole($insertData);
+
         if($res)
         {
             echoMsg(10003, site_url(BACKEND_DIR_NAME.'/role'), 'yes');
-        }else
+        }
+        else
         {
             echoMsg(10004);
         }
     }
-    
+
     /**
-     * 修改处理
-     * @author  alan    2014.7.22
-     */ 
+     * 修改角色操作
+     */
     function update()
     {
         noPrivShowMsg('roleEdit');  
@@ -110,30 +111,40 @@ class Role extends MY_Controller
 		{
 			echoMsg(validation_errors());
 		}
-        
-        $res = $this->Admin_role_model->updateRecord();
+
+        $id         = intval($this->input->post("id"));
+        $updateData = [
+            'role_name'     => $this->input->post('role_name'),
+            'role_code'     => $this->input->post('role_code'),
+            'role_describe' => $this->input->post('role_describe'),
+        ];
+        $res = $this->Admin_role_model->updateRole($id, $updateData);
+
         if($res)
         {
             echoMsg(10000, site_url(BACKEND_DIR_NAME.'/role'), 'yes');
-        }else
+        }
+        else
         {
             echoMsg(10001);
         }
     }
-    
+
     /**
-     * 删除处理
-     * @author  alan    2014.7.22
-     */ 
+     * 删除角色操作
+     */
     function delete()
     {
         noPrivShowMsg('roleDel');
 
-        $res = $this->Admin_role_model->deleteRecord();
+        $id  = intval($this->input->get('id'));
+        $res = $this->Admin_role_model->deleteRole($id);
+
         if($res)
         {
             echoMsg(10005, site_url(BACKEND_DIR_NAME.'/role'), 'yes');
-        }else
+        }
+        else
         {
             echoMsg(10006);
         }

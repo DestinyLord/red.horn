@@ -253,8 +253,8 @@ class Data_model extends CI_Model
 
         $params['where'] && $db->where($params['where']);
 
-        //$params['join'] && $db->join($params['join']['table'], $params['join']['cond'], $params['join']['type']);
-        //改成支持多联表 alan改 2015.7.14
+        $params['or_where'] && $db->or_where($params['or_where']);
+
         if (isset($params['join']) && count($params['join'], COUNT_RECURSIVE) > 3)
         {
             foreach ($params['join'] as $v)
@@ -348,6 +348,7 @@ class Data_model extends CI_Model
         $paramRange = array(
             'distinct',
             'where',
+            'or_where',
             'where_in',
             'where_not_in',
             'like',
