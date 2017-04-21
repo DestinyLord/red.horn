@@ -28,11 +28,10 @@ class Menu extends MY_Controller
     function add()
     {
         noPrivShowMsg('menuAdd');
-        $editData = array();
+        $editData = [];
         
         $menuList = $this->Admin_menu_model->getMenuItems();
         $this->template->assign('menuList' ,$menuList);
-        
         $this->template->assign('editData' ,$editData);
         $this->template->assign('formAction' ,site_url(BACKEND_DIR_NAME.'/menu/insert'));
         $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['menu_add']);//位置信息
