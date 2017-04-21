@@ -154,7 +154,7 @@ class Menu extends MY_Controller
     public function delete()
     {
         noPrivShowMsg('menuDel');
-        $id     = intval($this->input->get('id'));
+        $id     = $this->input->get('id');
         $isUsed = $this->Admin_menu_model->getMenuItem(
             ['where' => ['parent_id' => $id]]
         );

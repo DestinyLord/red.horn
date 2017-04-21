@@ -286,32 +286,30 @@ class Admin_model extends Core_model
 			return 0;
 		}
 	}
-    
-    
+
+
     /**
      * 检查用户是否已存在
-     * @author  alan    2014.8.6
-     * @return  boolean     true or false
-     */ 
-    function checkUserIsExist()
+     *
+     * @param int $id
+     * @param $userName
+     * @return bool
+     */
+    function checkUserIsExist($id = 0, $userName)
     {
-        $id = $this->input->post('id');
-        $username = $this->input->post('username');
         //检查用户名是否存在
         if($id)
         {
-            $query=$this->db->get_where("admin",array('username'=>$username, 'id !=' => $id));
-        }else
-        {
-            $query=$this->db->get_where("admin",array('username'=>$username));
+            $where = ['id !=' => $id, 'username' => $userName];
         }
-        if($query->num_rows()>0)
+        else
         {
-        	return true;
-        }else
-        {
-            return false;
+            $where = ['username' => $userName];
         }
+
+        $result = $this->getTotals($this->_tableName, ['where' => $where]);
+
+        return !boolval($result);
     }
     
     /**
@@ -530,7 +528,7 @@ class Admin_model extends Core_model
      */
     function deleteRecord()
     {
-        $ids = intval($this->input->get('id'));
+        $ids   = $this->input->get('id');
         $where = '';
         if(is_array($ids))
         {
