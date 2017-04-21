@@ -16,6 +16,27 @@ class Admin_menu_model extends Core_model
 	}
 
     /**
+     * 根据条件获取某个菜单数据
+     *
+     * @param $params
+     * @param string $keyWord
+     * @return array
+     */
+    public function getMenuItem($params, $keyWord = '')
+    {
+        $result = $this->getItem($this->_tableName, $params);
+
+        if (!empty($result) && !empty($keyWord) && isset($result[$keyWord]))
+        {
+            return $result[$keyWord];
+        }
+        else
+        {
+            return $result;
+        }
+    }
+
+    /**
      * 根据条件获取多个菜单数据
      *
      * @param array $params
@@ -56,27 +77,6 @@ class Admin_menu_model extends Core_model
                 }
             }
         }, $data);
-    }
-
-    /**
-     * 根据条件获取某个菜单数据
-     *
-     * @param $params
-     * @param string $keyWord
-     * @return array
-     */
-    public function getMenuItem($params, $keyWord = '')
-    {
-        $result = $this->getItem($this->_tableName, $params);
-
-        if (!empty($result) && !empty($keyWord) && isset($result[$keyWord]))
-        {
-            return $result[$keyWord];
-        }
-        else
-        {
-            return $result;
-        }
     }
 
     /**
