@@ -14,32 +14,15 @@ class Admin_role_model extends Core_model
 	{
 		parent::__construct();
 	}
-    
-    /**
-     * 获取所有菜单除了超级管理员
-     * @author  alan    2014.7.21
-     * @return  Array OR FALSE   二维数组或FALSE
-     */ 
-    function getRecords()
-	{
-		$this->db->order_by('id','Asc');
-		$query=$this->db->get_where("admin_role" ,array('id !=' => 1));
-        
-        if($query->num_rows() > 0)
-        {
-            return $query->result_array();
-        }
-		return FALSE;
-	}
 
     /**
      * 根据条件获取某个权限数据
      *
-     * @param $params
+     * @param array $params
      * @param string $keyWord
      * @return array
      */
-	public function getRoleItem($params, $keyWord = '')
+    public function getRoleItem($params =[], $keyWord = '')
     {
         $result = $this->getItem($this->_tableName, $params);
 
@@ -52,25 +35,25 @@ class Admin_role_model extends Core_model
             return $result;
         }
     }
-	
-       
+
     /**
-     * 获取一条菜单记录
-     * @author  alan    2014.7.21
-     * @param   $id     INT     表ID 
-     * @return  Array OR FALSE   一维数组或FALSE
-     */ 
-    function getRecord($id)
-	{
-		$query = $this->db->get_where('admin_role',array('id'=>$id));
-        if($query->num_rows() > 0)
-        {
-            return $query->row_array();
-        }else
-        {
-            return FALSE;
-        }
-	}
+     * 根据条件获取多个权限数据，除了超级管理员
+     *
+     * @param array $params
+     * @return array
+     */
+    public function getRoleItems($params =[])
+    {
+        $params['order_by'] = 'id ASC';
+        // 超级管理员不允许显示
+        $params['where']['id !='] = 1;
+
+        $result = $this->getItems(
+            $this->_tableName, '*', $params
+        );
+
+        return $result;
+    }
     
     /**
      * 插入记录
