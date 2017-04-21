@@ -4,7 +4,7 @@ class Ad extends MY_Controller
 	function __construct()
 	{
 		parent::__construct();
-        //echo date('Y-m-d H:i:s' ,1407402480720 /1000);exit;
+        //echo date('Y-m-d H:i:s', 1407402480720 /1000);exit;
         check_admin_is_login();
         $this->template->set_folder(BACKEND_VIEW_DIR_NAME.'/ad');
         $this->load->model(BACKEND_MODEL_DIR_NAME.'/Ad_model');
@@ -18,8 +18,8 @@ class Ad extends MY_Controller
 	{
         noPrivShowMsg('adManage');
         $datas = $this->Ad_model->getRecords();
-        $this->template->assign('datas' ,$datas);
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['adManage']);//位置信息
+        $this->template->assign('datas', $datas);
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['adManage']);//位置信息
         $this->template->display('index.tpl');
 	}
     
@@ -41,12 +41,12 @@ class Ad extends MY_Controller
 
         $editData = array();
         $channelList = $this->Ad_model->getChannelList();
-        $this->template->assign('channelList' ,$channelList);
+        $this->template->assign('channelList', $channelList);
 
         
-        $this->template->assign('editData' ,$editData);
-        $this->template->assign('formAction' ,site_url(BACKEND_DIR_NAME.'/ad/insert'));
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['adAdd']);//位置信息
+        $this->template->assign('editData', $editData);
+        $this->template->assign('formAction', site_url(BACKEND_DIR_NAME.'/ad/insert'));
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['adAdd']);//位置信息
         $this->template->display('add.tpl');
     }
     
@@ -81,20 +81,20 @@ class Ad extends MY_Controller
         }   
         
         $channelList = $this->Ad_model->getChannelList();
-        $this->template->assign('channelList' ,$channelList);
+        $this->template->assign('channelList', $channelList);
 
         $pageList = $this->Ad_model->getAdPagelList($editData['channel_id']);
-        $this->template->assign('pageList' ,$pageList);
+        $this->template->assign('pageList', $pageList);
 
         $positionList = $this->Ad_model->getAdPositionList($editData['page_id']);
-        $this->template->assign('positionList' ,$positionList);
+        $this->template->assign('positionList', $positionList);
 
         $images = $this->Ad_model->getAdImages($editData['id']);
-        $this->template->assign('images' ,$images);
+        $this->template->assign('images', $images);
 
-        $this->template->assign('editData' ,$editData);
-        $this->template->assign('formAction' ,site_url(BACKEND_DIR_NAME.'/ad/update'));
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['adEdit']);//位置信息
+        $this->template->assign('editData', $editData);
+        $this->template->assign('formAction', site_url(BACKEND_DIR_NAME.'/ad/update'));
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['adEdit']);//位置信息
         $this->template->display('edit.tpl');
     }
     
@@ -121,7 +121,7 @@ class Ad extends MY_Controller
             echoMsg(10003, site_url(BACKEND_DIR_NAME.'/ad'), 'yes');
         }else
         {
-            echoMsg(10004 );
+            echoMsg(10004);
         }
     }
     

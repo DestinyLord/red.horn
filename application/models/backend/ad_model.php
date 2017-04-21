@@ -15,11 +15,11 @@ class Ad_model extends CI_Model
      */ 
 	function getRecords()
 	{
-        $this->db->select('t.* ,adcha.channel_name ,adpage.page_name ,adpos.position_name' ,false);
+        $this->db->select('t.*, adcha.channel_name, adpage.page_name, adpos.position_name', false);
         $this->db->from('ad AS t');
-        $this->db->join('ad_channel AS adcha' ,'t.channel_id = adcha.channel_id' ,'left');
-        $this->db->join('ad_page AS adpage' ,'t.page_id = adpage.page_id' ,'left');
-        $this->db->join('ad_position AS adpos' ,'t.position_id = adpos.position_id' ,'left');
+        $this->db->join('ad_channel AS adcha', 't.channel_id = adcha.channel_id', 'left');
+        $this->db->join('ad_page AS adpage', 't.page_id = adpage.page_id', 'left');
+        $this->db->join('ad_position AS adpos', 't.position_id = adpos.position_id', 'left');
         $this->db->order_by('t.id DESC');
 		$query=$this->db->get();
         if($query->num_rows() > 0)
@@ -91,11 +91,11 @@ class Ad_model extends CI_Model
                     $adImgs[$k]['pic_path'] = $img;
                 }
 
-                $this->db->insert_batch('ad_images' ,$adImgs);
+                $this->db->insert_batch('ad_images', $adImgs);
                 if($this->db->affected_rows() > 0) //添加成功后，清除图片资料
                 {
                     $uploadData['ad'] = array();
-                    $this->session->set_userdata('uploadData' ,$uploadData);
+                    $this->session->set_userdata('uploadData', $uploadData);
                 }
             }
             return true;
@@ -137,8 +137,8 @@ class Ad_model extends CI_Model
 
         $data['end_time'] = strtotime($data['end_time']);//时间转成时间戳
 		
-        $this->db->where('id' ,$id);
-        $this->db->update("ad" ,$data);
+        $this->db->where('id', $id);
+        $this->db->update("ad", $data);
         $dataRes = $this->db->affected_rows(); //数据修改状态
 
         $uploadData = $this->session->userdata('uploadData');
@@ -152,12 +152,12 @@ class Ad_model extends CI_Model
                 $adImgs[$k]['pic_path'] = $img;
             }
 
-            $this->db->insert_batch('ad_images' ,$adImgs);
+            $this->db->insert_batch('ad_images', $adImgs);
 
             $imageRes = $this->db->affected_rows();
             //清除图片，不管操作成功还是失败都清除这次缓存的图片内容
             $uploadData['ad'] = array();
-            $this->session->set_userdata('uploadData' ,$uploadData);
+            $this->session->set_userdata('uploadData', $uploadData);
             
         }
         if($dataRes > 0 || $imgData > 0)
@@ -183,10 +183,10 @@ class Ad_model extends CI_Model
 
         if(is_array($ids))
         {
-            $this->db->where_in('id' ,$ids);
+            $this->db->where_in('id', $ids);
         }else
         {
-            $this->db->where('id' ,$ids);
+            $this->db->where('id', $ids);
         }
         
         $this->db->delete('ad');
@@ -202,7 +202,7 @@ class Ad_model extends CI_Model
 
     /**
      * 根据广告ID删除图片
-     * @param  String OR Array $ids id ,或id数组
+     * @param  String OR Array $ids id, 或id数组
      * @return Boolean
      */
     public function delImageByAdId($ids)
@@ -210,10 +210,10 @@ class Ad_model extends CI_Model
         //删除图片
         if(is_array($ids))
         {
-            $this->db->where_in('ad_id' ,$ids);
+            $this->db->where_in('ad_id', $ids);
         }else
         {
-            $this->db->where('ad_id' ,$ids);
+            $this->db->where('ad_id', $ids);
         }
         $imagesList = $this->db->get('ad_images')->result_array();
         if(!empty($imagesList))
@@ -226,10 +226,10 @@ class Ad_model extends CI_Model
 
         if(is_array($ids))
         {
-            $this->db->where_in('ad_id' ,$ids);
+            $this->db->where_in('ad_id', $ids);
         }else
         {
-            $this->db->where('ad_id' ,$ids);
+            $this->db->where('ad_id', $ids);
         }
         $this->db->delete('ad_images');
         return $this->db->affected_rows();
@@ -237,7 +237,7 @@ class Ad_model extends CI_Model
 
     /**
      * 删除图片
-     * @param  String OR Array $ids id ,或id数组
+     * @param  String OR Array $ids id, 或id数组
      * @return Boolean
      */
     public function delImage($ids)
@@ -245,10 +245,10 @@ class Ad_model extends CI_Model
         //删除图片
         if(is_array($ids))
         {
-            $this->db->where_in('id' ,$ids);
+            $this->db->where_in('id', $ids);
         }else
         {
-            $this->db->where('id' ,$ids);
+            $this->db->where('id', $ids);
         }
         $imagesList = $this->db->get('ad_images')->result_array();
         if(!empty($imagesList))
@@ -260,10 +260,10 @@ class Ad_model extends CI_Model
         }
         if(is_array($ids))
         {
-            $this->db->where_in('id' ,$ids);
+            $this->db->where_in('id', $ids);
         }else
         {
-            $this->db->where('id' ,$ids);
+            $this->db->where('id', $ids);
         }
         $this->db->delete('ad_images');
         return $this->db->affected_rows();
@@ -292,7 +292,7 @@ class Ad_model extends CI_Model
     {
         if(!empty($channelId))
         {
-            $this->db->where('channel_id' ,$channelId);
+            $this->db->where('channel_id', $channelId);
         }
         $query = $this->db->get('ad_page');
         if($query->num_rows() > 0)
@@ -310,7 +310,7 @@ class Ad_model extends CI_Model
     {
         if(!empty($pageId))
         {
-            $this->db->where('page_id' ,$pageId);
+            $this->db->where('page_id', $pageId);
         }
         $query = $this->db->get('ad_position');
         if($query->num_rows() > 0)
@@ -329,7 +329,7 @@ class Ad_model extends CI_Model
     {
         if(!empty($adId))
         {
-            $this->db->where('ad_id' ,$adId);
+            $this->db->where('ad_id', $adId);
         }
         $list = $this->db->get('ad_images')->result_array();
 

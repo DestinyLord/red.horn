@@ -4,7 +4,7 @@ class Log extends MY_Controller
 	function __construct()
 	{
 		parent::__construct();
-        //echo date('Y-m-d H:i:s' ,1407402480720 /1000);exit;
+        //echo date('Y-m-d H:i:s', 1407402480720 /1000);exit;
         check_admin_is_login();
         $this->template->set_folder(BACKEND_VIEW_DIR_NAME . '/log');
         $this->load->model(BACKEND_MODEL_DIR_NAME . '/Log_model');
@@ -23,9 +23,9 @@ class Log extends MY_Controller
         //商务列表
         $this->load->model(BACKEND_MODEL_DIR_NAME . '/Admin_model');
         $adminUser = $this->Admin_model->getAdminItems();
-        $this->template->assign('adminUser' ,$adminUser);
+        $this->template->assign('adminUser', $adminUser);
         
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['adminLog']);//位置信息
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['adminLog']);//位置信息
         $this->template->display('index.tpl');
 	}
     

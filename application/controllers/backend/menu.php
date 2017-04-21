@@ -17,8 +17,8 @@ class Menu extends MY_Controller
 	{
         noPrivShowMsg('menuManage');
         $datas = $this->Admin_menu_model->getMenuItems();
-        $this->template->assign('datas' ,$datas);
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['menu']);//位置信息
+        $this->template->assign('datas', $datas);
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['menu']);//位置信息
         $this->template->display('index.tpl');
 	}
 
@@ -31,10 +31,10 @@ class Menu extends MY_Controller
         $editData = [];
         
         $menuList = $this->Admin_menu_model->getMenuItems();
-        $this->template->assign('menuList' ,$menuList);
-        $this->template->assign('editData' ,$editData);
-        $this->template->assign('formAction' ,site_url(BACKEND_DIR_NAME.'/menu/insert'));
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['menu_add']);//位置信息
+        $this->template->assign('menuList', $menuList);
+        $this->template->assign('editData', $editData);
+        $this->template->assign('formAction', site_url(BACKEND_DIR_NAME.'/menu/insert'));
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['menu_add']);//位置信息
         $this->template->display('info.tpl');
     }
 
@@ -61,10 +61,10 @@ class Menu extends MY_Controller
         
         $menuList = $this->Admin_menu_model->getMenuItems();
 
-        $this->template->assign('menuList' ,$menuList);
-        $this->template->assign('editData' ,$editData);
-        $this->template->assign('formAction' ,site_url(BACKEND_DIR_NAME.'/menu/update'));
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['menu_edit']);//位置信息
+        $this->template->assign('menuList', $menuList);
+        $this->template->assign('editData', $editData);
+        $this->template->assign('formAction', site_url(BACKEND_DIR_NAME.'/menu/update'));
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['menu_edit']);//位置信息
         $this->template->display('info.tpl');
     }
 
@@ -98,11 +98,11 @@ class Menu extends MY_Controller
 
         if($res)
         {
-            echoMsg(10003 ,site_url(BACKEND_DIR_NAME.'/menu') ,'yes');
+            echoMsg(10003, site_url(BACKEND_DIR_NAME.'/menu'), 'yes');
         }
         else
         {
-            echoMsg(10004 );
+            echoMsg(10004);
         }
     }
 

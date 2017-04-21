@@ -157,7 +157,7 @@ class Admin_menu_model extends Core_model
             echoMsg(10015);
         }
 
-        //如果更改了父ID ,就更新父ID的记录和自己的记录
+        //如果更改了父ID, 就更新父ID的记录和自己的记录
 		if($parentId != $oldParentId)
 		{
             $row = $this->getMenuItem(['where' => ['id' => $parentId]]);

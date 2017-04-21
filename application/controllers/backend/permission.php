@@ -17,8 +17,8 @@ class Permission extends MY_Controller
 	{
         noPrivShowMsg('permissionManage');
         $datas = $this->Admin_action_model->getRecords();
-        $this->template->assign('datas' ,$datas);
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['permission']);//位置信息
+        $this->template->assign('datas', $datas);
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['permission']);//位置信息
         $this->template->display('index.tpl');
 	}
     
@@ -32,11 +32,11 @@ class Permission extends MY_Controller
         $editData = array();
         
         $permissionList = $this->Admin_action_model->getRecords();
-        $this->template->assign('permissionList' ,$permissionList);
+        $this->template->assign('permissionList', $permissionList);
         
-        $this->template->assign('editData' ,$editData);
-        $this->template->assign('formAction' ,site_url(BACKEND_DIR_NAME.'/permission/insert'));
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['permission_add']);//位置信息
+        $this->template->assign('editData', $editData);
+        $this->template->assign('formAction', site_url(BACKEND_DIR_NAME.'/permission/insert'));
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['permission_add']);//位置信息
         $this->template->display('info.tpl');
     }
     
@@ -58,11 +58,11 @@ class Permission extends MY_Controller
         }   
         
         $permissionList = $this->Admin_action_model->getRecords();
-        $this->template->assign('permissionList' ,$permissionList);
+        $this->template->assign('permissionList', $permissionList);
         
-        $this->template->assign('editData' ,$editData);
-        $this->template->assign('formAction' ,site_url(BACKEND_DIR_NAME.'/permission/update'));
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['permission_edit']);//位置信息
+        $this->template->assign('editData', $editData);
+        $this->template->assign('formAction', site_url(BACKEND_DIR_NAME.'/permission/update'));
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['permission_edit']);//位置信息
         $this->template->display('info.tpl');
     }
     
@@ -81,10 +81,10 @@ class Permission extends MY_Controller
         $res = $this->Admin_action_model->insertRecord();
         if($res)
         {
-            echoMsg(10003 ,site_url(BACKEND_DIR_NAME.'/permission') ,'yes');
+            echoMsg(10003, site_url(BACKEND_DIR_NAME.'/permission'), 'yes');
         }else
         {
-            echoMsg(10004 );
+            echoMsg(10004);
         }
     }
     
@@ -103,10 +103,10 @@ class Permission extends MY_Controller
         $res = $this->Admin_action_model->updateRecord();
         if($res)
         {
-            echoMsg(10000 ,site_url(BACKEND_DIR_NAME.'/permission') ,'yes');
+            echoMsg(10000, site_url(BACKEND_DIR_NAME.'/permission'), 'yes');
         }else
         {
-            echoMsg(10001 );
+            echoMsg(10001);
         }
     }
     
@@ -133,7 +133,7 @@ class Permission extends MY_Controller
      * @param   String  $type   分派类型
      * @param   INT     $id     分派ID
      */
-    function assignPriv($type ,$id)
+    function assignPriv($type, $id)
     {
         noPrivShowMsg('assignPriv');
         if(empty($type) || ($type != 'admin_user' && $type != 'role') || empty($id))
@@ -157,7 +157,7 @@ class Permission extends MY_Controller
                         $idArr[] = $childId['id'];
                     }
                 }
-                if(!in_array($id ,$idArr))
+                if(!in_array($id, $idArr))
                 {
                     echoMsg(10007);
                 }
@@ -179,15 +179,15 @@ class Permission extends MY_Controller
             $curData = explode(',',$roleData['action_list']);       
         }
 
-        $this->template->assign('curData' ,$curData);
-        $this->template->assign('type' ,$type);
-        $this->template->assign('id' ,$id);
+        $this->template->assign('curData', $curData);
+        $this->template->assign('type', $type);
+        $this->template->assign('id', $id);
         if($type == 'admin_user')
         {
-            $this->template->assign('name' ,$userData['surname'] ? $userData['surname'] : $userData['username']);
+            $this->template->assign('name', $userData['surname'] ? $userData['surname'] : $userData['username']);
         }else
         {
-            $this->template->assign('name' ,$roleData['role_name']);
+            $this->template->assign('name', $roleData['role_name']);
         }
         $list = $this->Admin_action_model->getRecords();
         $newList = array();
@@ -199,8 +199,8 @@ class Permission extends MY_Controller
                 $newList[] = $v;
             }
         }
-        $this->template->assign('breadCurumbs' ,$this->breadCurumbs['backend']['permission_assign_priv']);//位置信息
-        $this->template->assign('actionList' ,$newList);
+        $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['permission_assign_priv']);//位置信息
+        $this->template->assign('actionList', $newList);
         $this->template->display('assign_priv.tpl');
     }
     
@@ -214,7 +214,7 @@ class Permission extends MY_Controller
         $id = $this->input->post('id');
         $type = $this->input->post('type');
         $data = $this->input->post('actionList');
-        $status = $this->Admin_action_model->setAction($type,$id ,$data);
+        $status = $this->Admin_action_model->setAction($type,$id, $data);
         if($status)
         {
             if($type == 'admin_user')

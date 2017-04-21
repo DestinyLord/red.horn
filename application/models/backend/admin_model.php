@@ -135,12 +135,12 @@ class Admin_model extends Core_model
 	function parseRecords($pid)
 	{
 		static $records=array();
-        $this->db->select('a.* ,ar.role_name',false);
+        $this->db->select('a.*, ar.role_name',false);
         $this->db->from('admin AS a');
-        $this->db->join('admin_role AS ar' ,'a.admin_role_id = ar.id' ,'left');
-        $this->db->where('a.id != ' ,1); //不显示超级管理员
-        $this->db->where('a.parent_id' ,$pid );
-        $this->db->order_by('a.admin_role_id ,a.hits DESC ,a.id DESC');
+        $this->db->join('admin_role AS ar', 'a.admin_role_id = ar.id', 'left');
+        $this->db->where('a.id != ', 1); //不显示超级管理员
+        $this->db->where('a.parent_id', $pid);
+        $this->db->order_by('a.admin_role_id, a.hits DESC, a.id DESC');
 		$query=$this->db->get();
         if($query->num_rows() > 0)
         {
@@ -168,16 +168,16 @@ class Admin_model extends Core_model
         $_roleTableName = $this->Admin_role_model->_tableName;
 
         $this->db->select(
-            'a.* ,ar.role_name ,ap.surname AS psurname ,ap.username AS pusername',
+            'a.*, ar.role_name, ap.surname AS psurname, ap.username AS pusername',
             false
         );
         $this->db->from($this->_tableName . ' AS a');
         $this->db->join(
-            $_roleTableName . ' AS ar' ,'a.admin_role_id = ar.id' ,'left'
+            $_roleTableName . ' AS ar', 'a.admin_role_id = ar.id', 'left'
         );
         // 父级信息
         $this->db->join(
-            $this->_tableName . ' AS ap' ,'ap.id = a.parent_id' ,'left'
+            $this->_tableName . ' AS ap', 'ap.id = a.parent_id', 'left'
         );
         $this->db->where('a.id',$this->session->userdata('admin_id'));
         $query = $this->db->get();
@@ -229,7 +229,7 @@ class Admin_model extends Core_model
         	return 2;
         }
        
-       $salt =  mt_rand(1000 ,50000);
+       $salt =  mt_rand(1000, 50000);
 	   $options = array(
                 'parent_id'     => $parent_id ? $parent_id : 0,
                 'admin_role_id' => $this->input->post('admin_role_id'),
@@ -300,7 +300,7 @@ class Admin_model extends Core_model
         //检查用户名是否存在
         if($id)
         {
-            $query=$this->db->get_where("admin",array('username'=>$username ,'id !=' => $id));
+            $query=$this->db->get_where("admin",array('username'=>$username, 'id !=' => $id));
         }else
         {
             $query=$this->db->get_where("admin",array('username'=>$username));
@@ -337,8 +337,8 @@ class Admin_model extends Core_model
             ['where' => ['id' => $id]]
         );
         //检查这个操作人是否是这条记录的上级，不然，没资格修改
-        $parentIdArr = explode(',' ,trim($userData['queue'] ,','));
-        if(!in_array($this->session->userdata('admin_id') ,$parentIdArr) && $this->session->userdata('admin_id') != 1)
+        $parentIdArr = explode(',', trim($userData['queue'], ','));
+        if(!in_array($this->session->userdata('admin_id'), $parentIdArr) && $this->session->userdata('admin_id') != 1)
         {
             echoMsg(10002);
         }
@@ -364,12 +364,12 @@ class Admin_model extends Core_model
         if($this->input->post('new_password'))
         {
             
-            $salt =  mt_rand(1000 ,50000);
+            $salt =  mt_rand(1000, 50000);
             $options['password'] = md5($salt.$this->input->post('new_password'));
             $options['salt'] = $salt;
         }
         
-        //如果更改了父ID ,就更新父ID的记录和自己的记录
+        //如果更改了父ID, 就更新父ID的记录和自己的记录
 		if($parent_id != $old_parent_id)
 		{
 			$query=$this->db->get_where("admin",array('id'=>$parent_id));
@@ -492,7 +492,7 @@ class Admin_model extends Core_model
         {
             if($this->checkPasswordIsRight($this->input->post('current_password')))//检查原密码是否正确
             {
-                $salt = mt_rand(1000 ,50000);
+                $salt = mt_rand(1000, 50000);
                 $options['password'] = md5($salt.$newPassword);
                 $options['salt'] = $salt;
             }
@@ -502,7 +502,7 @@ class Admin_model extends Core_model
             }
         }
 
-        $options = array_merge($options ,$extraOptions);
+        $options = array_merge($options, $extraOptions);
 
         if(count($options) > 0)//存在修改的时候才执行
         {
@@ -538,7 +538,7 @@ class Admin_model extends Core_model
             {
                 echoMsg(10008);
             }
-            $where .= ' id IN ('.implode(',' ,$ids).')';
+            $where .= ' id IN ('.implode(',', $ids).')';
         }else
         {
             if($ids == 1)

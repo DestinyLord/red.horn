@@ -143,7 +143,7 @@ class Admin_role_model extends Core_model
             {
                 echoMsg(10008);
             }
-            $where .= ' id IN ('.implode(',' ,$ids).')';
+            $where .= ' id IN ('.implode(',', $ids).')';
         }else
         {
             if($ids == 1)

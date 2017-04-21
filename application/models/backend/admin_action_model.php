@@ -25,11 +25,11 @@ class Admin_action_model extends CI_Model
 	function parseRecords($pid)
 	{
 		static $records=array();
-        $this->db->select('a.* ,b.action_title AS relevance_title' ,false);
+        $this->db->select('a.*, b.action_title AS relevance_title', false);
         $this->db->from('admin_action AS a');
-        $this->db->join('admin_action AS b' ,'a.relevance_code = b.action_code AND a.relevance_code IS NOT NULL' ,'left');
-        $this->db->where('a.parent_id' ,$pid ,false);
-        $this->db->where('a.is_enable' ,1);
+        $this->db->join('admin_action AS b', 'a.relevance_code = b.action_code AND a.relevance_code IS NOT NULL', 'left');
+        $this->db->where('a.parent_id', $pid, false);
+        $this->db->where('a.is_enable', 1);
         $this->db->order_by('b.action_id ASC');
 		$query=$this->db->get();
         if($query->num_rows() > 0)
@@ -137,7 +137,7 @@ class Admin_action_model extends CI_Model
                 'relevance_code'      => $this->input->post('relevance_code'),
         );
         
-        //如果更改了父ID ,就更新父ID的记录和自己的记录
+        //如果更改了父ID, 就更新父ID的记录和自己的记录
 		if($parent_id != $old_parent_id)
 		{
 			$query=$this->db->get_where("admin_action",array('action_id'=>$parent_id));
@@ -258,7 +258,7 @@ class Admin_action_model extends CI_Model
      *  @param      string  $type 设置的类型，分为用户和角色 
      *  @return     boolean     
      */ 
-    function setAction($type ,$id ,$data)
+    function setAction($type, $id, $data)
     {
         $affRow = 0;
         if(is_array($data) && !empty($data))
@@ -270,11 +270,11 @@ class Admin_action_model extends CI_Model
         }        
         if($type == 'admin_user')
         {
-            $this->db->update('admin' ,array('action_list'=>$actionStr) ,array('id'=>$id));          
+            $this->db->update('admin', array('action_list'=>$actionStr), array('id'=>$id));
             $affRow = $this->db->affected_rows();
         }else
         {
-            $this->db->update('admin_role' ,array('action_list'=>$actionStr) ,array('id'=>$id));
+            $this->db->update('admin_role', array('action_list'=>$actionStr), array('id'=>$id));
             $affRow = $this->db->affected_rows();            
         }
         
@@ -282,7 +282,7 @@ class Admin_action_model extends CI_Model
         {
             if($type == 'admin_user')
             {
-                $data = $this->db->get_where('admin' ,array('id' => $id))->row_array();
+                $data = $this->db->get_where('admin', array('id' => $id))->row_array();
 
                 // 添加操作日志
                 $this->load->model(BACKEND_MODEL_DIR_NAME . '/Admin_log_model');
@@ -291,7 +291,7 @@ class Admin_action_model extends CI_Model
                 );
             }else
             {
-                $data = $this->db->get_where('admin_role' ,array('id' => $id))->row_array();
+                $data = $this->db->get_where('admin_role', array('id' => $id))->row_array();
 
                 // 添加操作日志
                 $this->load->model(BACKEND_MODEL_DIR_NAME . '/Admin_log_model');

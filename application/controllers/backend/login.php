@@ -141,7 +141,7 @@ class Login extends CI_Controller
             ['where' => ['id' => $adminId]]
         );
 
-        $this->template->assign('userData' ,$userData);
+        $this->template->assign('userData', $userData);
 
         //验证错误初始化
         $validationErrors = '';
@@ -182,7 +182,7 @@ class Login extends CI_Controller
             
         }
 
-        $this->template->assign('validationErrors' ,$validationErrors);
+        $this->template->assign('validationErrors', $validationErrors);
         $this->template->display('lock.tpl');
     }
 

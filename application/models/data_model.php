@@ -155,7 +155,7 @@ class Data_model extends CI_Model
         // 初始化查询参数
         $params = $this->parseParams($params);
 
-        $db->select($select ,FALSE);
+        $db->select($select, FALSE);
 
         $params['distinct'] && $db->distinct($params['distinct']);
 
