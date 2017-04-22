@@ -43,14 +43,13 @@ class Admin_action_model extends Core_model
      */
     public function getActionItems($params = [])
     {
-        $params['join']                 = [
+        $params['join']     = [
             'table' => "{$this->_tableName} AS b",
             'cond'  => 'a.relevance_code = b.action_code',
             'type'  => 'left'
         ];
-        $params['where']['a.is_enable'] = 1;
-        $params['order_by']             = 'a.action_id ASC';
-        $data                           = $this->getItems(
+        $params['order_by'] = 'a.action_id ASC';
+        $data               = $this->getItems(
             "{$this->_tableName} AS a",
             'a.*, b.action_title AS relevance_title',
             $params
@@ -132,111 +131,135 @@ class Admin_action_model extends Core_model
 			return FALSE;
 		}
 	}
-    
+
     /**
-     * 更改记录
-     * @author  alan    2014.7.22
-     * @return  Boolean   TRUE 或 FALSE  
+     * 权限修改操作
+     *
+     * @param $id
+     * @param $actionTitle
+     * @param $parentId
+     * @param $oldParentId
+     * @param $updateData
+     * @return bool
      */
-    function updateRecord()
+    function updateAction($id, $actionTitle, $parentId, $oldParentId, $updateData)
 	{
-		$parent_id=$this->input->post("parent_id");
-		$old_parent_id=$this->input->post("old_parent_id");
-		$id=$this->input->post("id");
-        
-        $options = array(
-                'parent_id'     => $parent_id,
-                'action_title'    => $this->input->post('action_title'),
-                'action_code'    => $this->input->post('action_code'),
-                'relevance_code'      => $this->input->post('relevance_code'),
+        // 判断权限名称是否已经存在
+        $isExist = $this->getTotals(
+            $this->_tableName,
+            [
+                'where' => [
+                    'action_title' => $actionTitle,
+                    'action_id !=' => $id
+                ]
+            ]
         );
-        
+
+        if ($isExist > 0)
+        {
+            echoMsg(10019);
+        }
+
         //如果更改了父ID, 就更新父ID的记录和自己的记录
-		if($parent_id != $old_parent_id)
+		if($parentId != $oldParentId)
 		{
-			$query=$this->db->get_where("admin_action",array('action_id'=>$parent_id));
-			if($query->num_rows()>0)
+            $row = $this->getActionItem(['where' => ['action_id' => $parentId]]);
+
+			if(!empty($row))
 			{
-				$row=$query->row_array();
-				$level=(int)$row['level']+1;
-				$queue=$row['queue'].$id.",";
+				$level = (int)$row['level'] + 1;
+				$queue = $row['queue'] . $id . ",";
 			}
 			else
 			{
-				$level=0;
-				$queue=",".$id.",";
+				$level = 0;
+				$queue = "," . $id . ",";
 			}
+
+            $updateData['queue'] = $queue;
+            $updateData['level'] = $level;
+            $res = $this->update($this->_tableName, $updateData, ['action_id' => $id]);
             
-			$options['queue'] = $queue;
-            $options['level'] = $level;
-            
-			$this->db->update("admin_action",$options,array('action_id'=>$id));            
-            $res = $this->db->affected_rows();//是否修改成功标识
-            
-			if($old_parent_id)
+			if(!empty($oldParentId))
 			{
-				$query=$this->db->get_where("admin_action",array('parent_id'=>$old_parent_id));//检查原来的父ID里面是否还有子菜单
-				if($query->num_rows()>0)
-				{
-					$this->db->update("admin_action",array("has_child"=>1),array('action_id'=>$old_parent_id));
-				}
-				else
-				{
-					$this->db->update("admin_action",array("has_child"=>0),array('action_id'=>$old_parent_id));
-				}
+                // 检查原来的父ID里面是否还有子菜单
+                $oldHasChild = $this->getTotals(
+                    $this->_tableName, ['where' => ['parent_id' => $oldParentId]]
+                );
+
+                // 由于原父数据的has_child=1，所以不存在才修改
+                if (empty($oldHasChild))
+                {
+                    $this->update(
+                        $this->_tableName, ['has_child' => 0], ['action_id'=>$oldParentId]
+                    );
+                }
 			}
-			if($parent_id)//这条记录的父ID肯定是存在子元素
+
+            // 这条记录的父ID若不存在子数据，则修改
+			if(!empty($row) && empty($row['has_child']))
 			{
-				$this->db->update("admin_action",array("has_child"=>1),array('action_id'=>$parent_id));
+                $this->update(
+                    $this->_tableName, ['has_child' => 1], ['action_id'=>$parentId]
+                );
 			}
-			$hasChd = $this->input->post("has_child");
-			if($hasChd)
+
+            $hasChild = $this->input->post("has_child");
+
+			if(!empty($hasChild))
 			{
-				$this->update_qd($id,$queue,$level);
+				$this->updateQD($id, $queue, $level);
 			}
-		}else
+		}
+		else
         {
-            $this->db->update("admin_action",$options,array('action_id'=>$id));
-            
-            $res = $this->db->affected_rows();//是否修改成功标识
+            $res = $this->update($this->_tableName, $updateData, ['action_id' => $id]);
         }
-        
-        //echo $this->db->last_query();exit;
+
         if($res > 0)
         {
-            return true;
-        }else
+            // 添加操作日志
+            $this->load->model(BACKEND_MODEL_DIR_NAME . '/Admin_log_model');
+            $this->Admin_log_model->setAdminLog(
+                '修改权限：'.$actionTitle
+            );
+            return TRUE;
+        }
+        else
         {
-            return false;
+            return FALSE;
         }
 		
 	}
-    
+
     /**
      * 递归更改子菜单的级别和目录树
-     * @param   $pid    INT     父ID
-     * @param   $queue  String  目录树
-     * @param   $level  INT     目录级别     
-     */ 
-    function update_qd($pid,$queue,$level)
+     *
+     * @param $pid
+     * @param $queue
+     * @param $level
+     */
+    function updateQD($pid, $queue, $level)
 	{
-		$query=$this->db->get_where("admin_action",array('parent_id'=>$pid));
-        if($query->num_rows() > 0)
-        {
-            $res = $query->result();
-    		foreach($res as $row)
-    		{
-    			$data=array(
-    				'level'=>$level+1,
-    				'queue'=>$queue.$row->id.","
-    			);
-    			$this->db->update("admin_action",$data,array('action_id'=>$row->id));
+	    $data = $this->getActionItems(['where' => ['parent_id' => $pid]]);
 
-    			if($row->has_child)
-    			{
-    				$this->update_qd($row->id,$data['queue'],$data['deep_id']);
-    			}
-    		}
+        if(!empty($data))
+        {
+            foreach ($data as $item)
+            {
+                $updateData = [
+                    'level' => $level + 1,
+                    'queue' => $queue . $item['action_id'] . ","
+                ];
+                $this->update($this->_tableName, $updateData, ['action_id' => $item['action_id']]);
+
+                if ($item['has_child'])
+                {
+                    $this->updateQD(
+                        $item['action_id'], $updateData['queue'], $updateData['level']
+                    );
+                }
+            }
         }
 	}
     
@@ -259,10 +282,10 @@ class Admin_action_model extends Core_model
         $this->db->delete('admin_action');
         if($this->db->affected_rows() > 0)
         {
-            return true;
+            return TRUE;
         }else
         {
-            return false;
+            return FALSE;
         }
     }
     
@@ -313,10 +336,10 @@ class Admin_action_model extends Core_model
                     '分派权限：'.$data['role_name']
                 );
             }
-            return true;
+            return TRUE;
         }else
         {
-            return false;
+            return FALSE;
         }
     } 
 

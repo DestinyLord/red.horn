@@ -1,7 +1,7 @@
 <?php   if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Permission extends MY_Controller
 {
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
         check_admin_is_login();
@@ -12,7 +12,7 @@ class Permission extends MY_Controller
     /**
      * 权限管理
      */
-	function index()
+	public function index()
 	{
         noPrivShowMsg('permissionManage');
         $datas = $this->Admin_action_model->getActionItems();
@@ -25,7 +25,7 @@ class Permission extends MY_Controller
     /**
      * 权限新增页面
      */
-    function add()
+    public function add()
     {
         noPrivShowMsg('permissionAdd');
         $editData = [];
@@ -44,7 +44,7 @@ class Permission extends MY_Controller
      *
      * @param $id
      */
-    function edit($id)
+    public function edit($id)
     {
         noPrivShowMsg('permissionEdit');
         $editData = [];
@@ -72,7 +72,7 @@ class Permission extends MY_Controller
     /**
      * 权限新增操作
      */
-    function insert()
+    public function insert()
     {
         noPrivShowMsg('permissionAdd');
         $this->form_validation->set_rules("action_title","权限名称","trim|required");
@@ -102,24 +102,39 @@ class Permission extends MY_Controller
             echoMsg(10004);
         }
     }
-    
+
     /**
-     * 修改处理
-     * @author  alan    2014.7.22
-     */ 
-    function update()
+     * 权限修改操作
+     */
+    public function update()
     {
         noPrivShowMsg('permissionEdit');
         $this->form_validation->set_rules("action_title","权限名称","trim|required");
+
         if($this->form_validation->run()==FALSE)
 		{
 			echoMsg(validation_errors());
-		}    
-        $res = $this->Admin_action_model->updateRecord();
+		}
+
+        $id          = $this->input->post("id");
+        $actionTitle = $this->input->post('action_title');
+        $parentId    = $this->input->post("parent_id");
+        $oldParentId = $this->input->post("old_parent_id");
+        $updateData  = [
+            'parent_id'      => $parentId,
+            'action_title'   => $actionTitle,
+            'action_code'    => $this->input->post('action_code'),
+            'relevance_code' => $this->input->post('relevance_code'),
+        ];
+        $res = $this->Admin_action_model->updateAction(
+            $id, $actionTitle, $parentId, $oldParentId, $updateData
+        );
+
         if($res)
         {
             echoMsg(10000, site_url(BACKEND_DIR_NAME.'/permission'), 'yes');
-        }else
+        }
+        else
         {
             echoMsg(10001);
         }

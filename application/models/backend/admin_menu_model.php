@@ -173,7 +173,6 @@ class Admin_menu_model extends Core_model
             
 			$updateData['queue'] = $queue;
             $updateData['level'] = $level;
-
             $res = $this->update($this->_tableName, $updateData, ['id' => $id]);
             
 			if(!empty($oldParentId))
@@ -183,13 +182,8 @@ class Admin_menu_model extends Core_model
                     $this->_tableName, ['where' => ['parent_id' => $oldParentId]]
                 );
 
-				if($oldHasChild > 0)
-				{
-				    $this->update(
-				        $this->_tableName, ['has_child' => 1], ['id'=>$oldParentId]
-                    );
-				}
-				else
+                // 由于原父数据的has_child=1，所以不存在才修改
+                if (empty($oldHasChild))
 				{
                     $this->update(
                         $this->_tableName, ['has_child' => 0], ['id'=>$oldParentId]
@@ -197,8 +191,8 @@ class Admin_menu_model extends Core_model
 				}
 			}
 
-			// 这条记录的父ID肯定是存在子元素
-			if(!empty($parentId))
+			// 这条记录的父ID若不存在子数据，则修改
+            if(!empty($row) && empty($row['has_child']))
 			{
                 $this->update(
                     $this->_tableName, ['has_child' => 1], ['id'=>$parentId]
@@ -207,7 +201,7 @@ class Admin_menu_model extends Core_model
 
 			$hasChild = $this->input->post("has_child");
 
-			if($hasChild)
+			if(!empty($hasChild))
 			{
 				$this->updateQD($id, $queue, $level);
 			}
@@ -257,7 +251,7 @@ class Admin_menu_model extends Core_model
                 if ($item['has_child'])
                 {
                     $this->updateQD(
-                        $item['id'], $updateData['queue'], $updateData['deep_id']
+                        $item['id'], $updateData['queue'], $updateData['level']
                     );
                 }
             }

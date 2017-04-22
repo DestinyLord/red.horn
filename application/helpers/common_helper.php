@@ -737,7 +737,7 @@ function getTreeData($data, $pid, &$result, $primary = 'id')
 
             if(!empty($item['has_child']))
             {
-                getTreeData($data, $item[$primary], $result);
+                getTreeData($data, $item[$primary], $result, $primary);
             }
         }
     }, $data);
