@@ -233,7 +233,7 @@ class Admin_action_model extends CI_Model
      */
     function deleteRecord()
     {
-        $ids = $this->input->get('id');
+        $ids = intval($this->input->get('id'));
         
         if(is_array($ids))
         {

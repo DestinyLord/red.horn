@@ -100,16 +100,16 @@ class Admin_model extends Core_model
      */
     public function getAdminItems($isTree = TRUE, $params = [])
     {
-        $params['order_by'] = 'a.admin_role_id, a.hits DESC, a.id DESC';
+        $params['order_by']         = 'a.admin_role_id, a.hits DESC, a.id DESC';
         $params['where']['a.id !='] = 1;
+
         $this->load->model(BACKEND_MODEL_DIR_NAME.'/Admin_role_model');
-        $params['join']     = [
+        $params['join'] = [
             'table' => "{$this->Admin_role_model->_tableName} AS ar",
             'cond'  => 'a.admin_role_id = ar.id',
             'type'  => 'left'
         ];
-
-        $data   = $this->getItems(
+        $data           = $this->getItems(
             "{$this->_tableName} AS a", 'a.*, ar.role_name', $params
         );
         $result = [];
@@ -191,12 +191,12 @@ class Admin_model extends Core_model
             return [];
         }
     }
-    
+
     /**
      * 检查当前用户的密码
-     * @author  alan    2014.7.30
-     * @param   String  $password   密码
-     * @return  JSON    true or false
+     *
+     * @param $password
+     * @return bool
      */
     function checkPasswordIsRight($password) 
     {
@@ -206,10 +206,11 @@ class Admin_model extends Core_model
         
         if(md5($admin['salt'] . $password) == $admin['password'])
         {
-            return true;
-        }else
+            return TRUE;
+        }
+        else
         {
-            return false;
+            return FALSE;
         }
     } 
     /**
@@ -528,7 +529,7 @@ class Admin_model extends Core_model
      */
     function deleteRecord()
     {
-        $ids   = $this->input->get('id');
+        $ids   = intval($this->input->get('id'));
         $where = '';
         if(is_array($ids))
         {

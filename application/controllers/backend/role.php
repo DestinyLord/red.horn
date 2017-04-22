@@ -112,7 +112,7 @@ class Role extends MY_Controller
 			echoMsg(validation_errors());
 		}
 
-        $id         = $this->input->post("id");
+        $id         = intval($this->input->post("id"));
         $updateData = [
             'role_name'     => $this->input->post('role_name'),
             'role_code'     => $this->input->post('role_code'),
@@ -137,7 +137,7 @@ class Role extends MY_Controller
     {
         noPrivShowMsg('roleDel');
 
-        $id  = $this->input->get('id');
+        $id  = intval($this->input->get('id'));
         $res = $this->Admin_role_model->deleteRole($id);
 
         if($res)

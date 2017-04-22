@@ -121,7 +121,7 @@ class Menu extends MY_Controller
 			echoMsg(validation_errors());
 		}
 
-        $id          = $this->input->post("id");
+        $id          = intval($this->input->post("id"));
         $menuTitle   = $this->input->post('menu_title');
         $parentId    = $this->input->post("parent_id");
         $oldParentId = $this->input->post("old_parent_id");

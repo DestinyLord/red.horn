@@ -148,6 +148,16 @@ class Admin_role_model extends Core_model
      */
     function deleteRole($id)
     {
+        $this->load->model(BACKEND_MODEL_DIR_NAME . '/Admin_model');
+        $isUsed = $this->Admin_model->getAdminItem(
+            ['where' => ['admin_role_id' => $id]], 'id'
+        );
+
+        if (!empty($isUsed))
+        {
+            echoMsg(10018);
+        }
+
         $data   = $this->getRoleItem(['where' => ['id' => $id]]);
         $result = FALSE;
 

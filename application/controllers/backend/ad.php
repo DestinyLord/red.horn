@@ -175,7 +175,7 @@ class Ad extends MY_Controller
      */
     public function delImage()
     {
-        $ids = $this->input->get('id');
+        $ids = intval($this->input->get('id'));
         $res = $this->Ad_model->delImage($ids);
         return true;
     }
