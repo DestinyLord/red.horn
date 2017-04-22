@@ -725,10 +725,11 @@ function jsonEcho($value)
  * @param $data
  * @param $pid
  * @param $result
+ * @param string $primary
  */
-function getTreeData($data, $pid, &$result)
+function getTreeData($data, $pid, &$result, $primary = 'id')
 {
-    array_map(function($item) use (&$result, $pid, $data)
+    array_map(function($item) use (&$result, $pid, $data, $primary)
     {
         if ($item['parent_id'] == $pid)
         {
@@ -736,7 +737,7 @@ function getTreeData($data, $pid, &$result)
 
             if(!empty($item['has_child']))
             {
-                getTreeData($data, $item['id'], $result);
+                getTreeData($data, $item[$primary], $result);
             }
         }
     }, $data);

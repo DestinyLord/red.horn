@@ -16,7 +16,7 @@ class Admin_menu_model extends Core_model
 	}
 
     /**
-     * 根据条件获取某个菜单数据
+     * 根据条件获取单个菜单数据
      *
      * @param $params
      * @param string $keyWord
@@ -64,7 +64,7 @@ class Admin_menu_model extends Core_model
      * @param $insertData
      * @return bool
      */
-    function insertMenu($parentId, $menuTitle, $insertData)
+    public function insertMenu($parentId, $menuTitle, $insertData)
 	{
 	    $isExist = $this->getTotals(
 	        $this->_tableName, ['where' => ['menu_title' => $menuTitle]]
@@ -110,9 +110,7 @@ class Admin_menu_model extends Core_model
 				$queue = "," . $insertId . ",";
 			}
 
-			$updateData = [
-				'queue' => $queue, 'level' => $level
-			];
+			$updateData = ['queue' => $queue, 'level' => $level];
 			$this->update($this->_tableName, $updateData, ['id' => $insertId]);
 
             // 添加操作日志
@@ -139,7 +137,7 @@ class Admin_menu_model extends Core_model
      * @param $updateData
      * @return bool
      */
-    function updateMenu($id, $menuTitle, $parentId, $oldParentId, $updateData)
+    public function updateMenu($id, $menuTitle, $parentId, $oldParentId, $updateData)
 	{
 	    // 判断菜单名称是否已经存在
         $isExist = $this->getTotals(
@@ -180,7 +178,7 @@ class Admin_menu_model extends Core_model
             
 			if(!empty($oldParentId))
 			{
-                //检查原来的父ID里面是否还有子菜单
+                // 检查原来的父ID里面是否还有子菜单
                 $oldHasChild = $this->getTotals(
                     $this->_tableName, ['where' => ['parent_id' => $oldParentId]]
                 );
@@ -199,7 +197,8 @@ class Admin_menu_model extends Core_model
 				}
 			}
 
-			if(!empty($parentId))//这条记录的父ID肯定是存在子元素
+			// 这条记录的父ID肯定是存在子元素
+			if(!empty($parentId))
 			{
                 $this->update(
                     $this->_tableName, ['has_child' => 1], ['id'=>$parentId]
@@ -241,7 +240,7 @@ class Admin_menu_model extends Core_model
      * @param   $queue  String  目录树
      * @param   $level  INT     目录级别     
      */ 
-    function updateQD($pid, $queue, $level)
+    public function updateQD($pid, $queue, $level)
 	{
 		$data = $this->getMenuItems(['where' => ['parent_id' => $pid]]);
 
@@ -272,7 +271,7 @@ class Admin_menu_model extends Core_model
      * @param $id
      * @return bool
      */
-    function deleteMenu($id)
+    public function deleteMenu($id)
     {
         $data   = $this->getMenuItem(['where' => ['id' => $id]]);
         $result = FALSE;

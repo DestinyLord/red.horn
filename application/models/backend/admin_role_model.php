@@ -16,7 +16,7 @@ class Admin_role_model extends Core_model
 	}
 
     /**
-     * 根据条件获取某个角色数据
+     * 根据条件获取单个角色数据
      *
      * @param array $params
      * @param string $keyWord

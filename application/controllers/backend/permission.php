@@ -8,81 +8,96 @@ class Permission extends MY_Controller
         $this->template->set_folder(BACKEND_VIEW_DIR_NAME.'/permission');
         $this->load->model(BACKEND_MODEL_DIR_NAME.'/Admin_action_model');
 	}
-	
+
     /**
      * 权限管理
-     * @author  alan    2014.7.22   
-     */ 
+     */
 	function index()
 	{
         noPrivShowMsg('permissionManage');
-        $datas = $this->Admin_action_model->getRecords();
+        $datas = $this->Admin_action_model->getActionItems();
+
         $this->template->assign('datas', $datas);
         $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['permission']);//位置信息
         $this->template->display('index.tpl');
 	}
-    
+
     /**
-     * 添加页面
-     * @author  alan    2014.7.22   
-     */ 
+     * 权限新增页面
+     */
     function add()
     {
         noPrivShowMsg('permissionAdd');
-        $editData = array();
+        $editData = [];
         
-        $permissionList = $this->Admin_action_model->getRecords();
+        $permissionList = $this->Admin_action_model->getActionItems();
+
         $this->template->assign('permissionList', $permissionList);
-        
         $this->template->assign('editData', $editData);
         $this->template->assign('formAction', site_url(BACKEND_DIR_NAME.'/permission/insert'));
         $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['permission_add']);//位置信息
         $this->template->display('info.tpl');
     }
-    
+
     /**
-     * 修改页面
-     * @author  alan    2014.7.22
-     * @param   $id     INT     表ID     
-     */ 
+     * 权限修改页面
+     *
+     * @param $id
+     */
     function edit($id)
     {
         noPrivShowMsg('permissionEdit');
-        $editData = array();
+        $editData = [];
+
         if($id)
         {
-            $editData = $this->Admin_action_model->getRecord($id);
-        }else
+            $editData = $this->Admin_action_model->getActionItem(
+                ['where' => ['action_id' => $id]]
+            );
+        }
+        else
         {
             echoMsg(10002);
         }   
         
-        $permissionList = $this->Admin_action_model->getRecords();
+        $permissionList = $this->Admin_action_model->getActionItems();
+
         $this->template->assign('permissionList', $permissionList);
-        
         $this->template->assign('editData', $editData);
         $this->template->assign('formAction', site_url(BACKEND_DIR_NAME.'/permission/update'));
         $this->template->assign('breadCurumbs', $this->breadCurumbs['backend']['permission_edit']);//位置信息
         $this->template->display('info.tpl');
     }
-    
+
     /**
-     * 添加处理
-     * @author  alan    2014.7.22
-     */ 
+     * 权限新增操作
+     */
     function insert()
     {
         noPrivShowMsg('permissionAdd');
         $this->form_validation->set_rules("action_title","权限名称","trim|required");
+
         if($this->form_validation->run()==FALSE)
 		{
 			echoMsg(validation_errors());
-		}    
-        $res = $this->Admin_action_model->insertRecord();
+		}
+
+        $parentId    = $this->input->post('parent_id');
+        $actionTitle = $this->input->post('action_title');
+        $insertData  = [
+            'parent_id'      => $parentId,
+            'action_title'   => $actionTitle,
+            'action_code'    => $this->input->post('action_code'),
+            'relevance_code' => $this->input->post('relevance_code'),
+            'has_child'      => 0,
+        ];
+        $res        = $this->Admin_action_model->insertAction($parentId, $actionTitle, $insertData);
+
         if($res)
         {
             echoMsg(10003, site_url(BACKEND_DIR_NAME.'/permission'), 'yes');
-        }else
+        }
+        else
         {
             echoMsg(10004);
         }
@@ -189,7 +204,7 @@ class Permission extends MY_Controller
         {
             $this->template->assign('name', $roleData['role_name']);
         }
-        $list = $this->Admin_action_model->getRecords();
+        $list = $this->Admin_action_model->getActionItems();
         $newList = array();
         //显示存在权限的列表
         foreach($list as $v)

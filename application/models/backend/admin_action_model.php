@@ -1,116 +1,130 @@
 <?php
-class Admin_action_model extends CI_Model
+class Admin_action_model extends Core_model
 {
+    /**
+     * @var string
+     */
+    protected $_tableName = 'backend_admin_action';
+
+    /**
+     * Admin_action_model constructor.
+     */
 	function __construct()
 	{
 		parent::__construct();
 	}
-    
+
     /**
-     * 获取所有菜单
-     * @author  alan    2014.7.21
-     * @return  Array OR false   二维数组或False
-     */ 
-    function getRecords()
-	{
-		return $this->parseRecords(0);
-	}
-	
-    /**
-     * 递归获取菜单数组
-     * @author  alan    2014.7.21
-     * @param   $id     父ID
-     * @return  Array OR false   二维数组或False
-     */ 
-	function parseRecords($pid)
-	{
-		static $records=array();
-        $this->db->select('a.*, b.action_title AS relevance_title', false);
-        $this->db->from('admin_action AS a');
-        $this->db->join('admin_action AS b', 'a.relevance_code = b.action_code AND a.relevance_code IS NOT NULL', 'left');
-        $this->db->where('a.parent_id', $pid, false);
-        $this->db->where('a.is_enable', 1);
-        $this->db->order_by('b.action_id ASC');
-		$query=$this->db->get();
-        if($query->num_rows() > 0)
+     * 根据条件获取单个权限数据
+     *
+     * @param $params
+     * @param string $keyWord
+     * @return array
+     */
+    public function getActionItem($params, $keyWord = '')
+    {
+        $result = $this->getItem($this->_tableName, $params);
+
+        if (!empty($result) && !empty($keyWord) && isset($result[$keyWord]))
         {
-            $resource = $query->result_array();
-    		foreach($resource as $row)
-    		{
-    			$records[]=$row;
-    			if($row['has_child']==1)
-    			{
-    				$this->parseRecords($row['action_id']);
-    			}
-    		}
+            return $result[$keyWord];
         }
-		return $records;
-	}
-    
-    /**
-     * 获取一条菜单记录
-     * @author  alan    2014.7.21
-     * @param   $id     INT     表ID 
-     * @return  Array OR false   一维数组或False
-     */ 
-    function getRecord($id)
-	{
-		$query = $this->db->get_where('admin_action',array('action_id'=>$id));
-        if($query->num_rows() > 0)
+        else
         {
-            return $query->row_array();
-        }else
-        {
-            return false;
+            return $result;
         }
-	}
-    
+    }
+
     /**
-     * 插入记录
-     * @author  alan    2014.7.21
-     * @return  INT OR Boolean   插入的新ID 或 FALSE  
-     */ 
-    function insertRecord()
-	{
-	   $parent_id = $this->input->post('parent_id');
-	   $options = array(
-                'parent_id'     => $parent_id,
-                'action_title'    => $this->input->post('action_title'),
-                'action_code'    => $this->input->post('action_code'),
-                'relevance_code'      => $this->input->post('relevance_code'),
-                'has_child'     => 0,
+     * 根据条件获取多个权限数据
+     *
+     * @param array $params
+     * @return array
+     */
+    public function getActionItems($params = [])
+    {
+        $params['join']                 = [
+            'table' => "{$this->_tableName} AS b",
+            'cond'  => 'a.relevance_code = b.action_code',
+            'type'  => 'left'
+        ];
+        $params['where']['a.is_enable'] = 1;
+        $params['order_by']             = 'a.action_id ASC';
+        $data                           = $this->getItems(
+            "{$this->_tableName} AS a",
+            'a.*, b.action_title AS relevance_title',
+            $params
         );
-		$this->db->insert("admin_action",$options);
-        
-		if($this->db->affected_rows())
+
+        $result = [];
+        $pid    = isset($params['parent_id']) ? intval($params['parent_id']) : 0;
+
+        getTreeData($data, $pid, $result, 'action_id');
+
+        return $result;
+    }
+
+    /**
+     * 权限新增操作
+     *
+     * @param $parentId
+     * @param $actionTitle
+     * @param $insertData
+     * @return bool
+     */
+    function insertAction($parentId, $actionTitle, $insertData)
+	{
+        $isExist = $this->getTotals(
+            $this->_tableName, ['where' => ['action_title' => $actionTitle]]
+        );
+
+        if ($isExist > 0)
+        {
+            echoMsg(10019);
+        }
+
+	    $insertId = $this->insert($this->_tableName, $insertData);
+
+		if(!empty($insertId))
 		{
-			$max_id = $this->db->insert_id();
-			if($parent_id)
+			if($parentId)
 			{
-				$query=$this->db->get_where("admin_action",array('action_id'=>$parent_id));
-				if($query->num_rows()>0)
+			    $parentData = $this->getActionItem(['where' => ['action_id' => $parentId]]);
+
+				if(!empty($parentData))
 				{
-					$row=$query->row_array();
-					$level=(int)$row['level']+1;
-					$queue=$row['queue'].$max_id.",";
+					$level = (int)$parentData['level'] + 1;
+					$queue = $parentData['queue'] . $insertId . ",";
+
+                    // 若原父菜单无子菜单，则更新父菜单
+                    if (empty($parentData['has_child']))
+                    {
+                        $this->update(
+                            $this->_tableName, ['has_child' => 1], ['action_id' => $parentId]
+                        );
+                    }
 				}
+                else
+                {
+                    echoMsg(10020);
+                    return FALSE;
+                }
 			}
 			else
 			{
-				$level=0;
-				$queue=",".$max_id.",";
+				$level = 0;
+				$queue = "," . $insertId . ",";
 			}
-			$data=array(
-				'queue'=>$queue,
-				'level'=>$level
-			);
-			$this->db->update("admin_action",$data,array('action_id'=>$max_id));
-            
-			if($parent_id)
-			{
-				$data=array('has_child'=>1);
-				$this->db->update("admin_action",$data,array('action_id'=>$parent_id));
-			}
+
+            $updateData = ['queue' => $queue, 'level' => $level];
+			$this->update($this->_tableName, $updateData, ['action_id' => $insertId]);
+
+            // 添加操作日志
+            $this->load->model(BACKEND_MODEL_DIR_NAME . '/Admin_log_model');
+            $this->Admin_log_model->setAdminLog(
+                '添加权限：'.$actionTitle
+            );
+
 			return TRUE;	
 		}
 		else

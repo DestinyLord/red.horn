@@ -71,7 +71,7 @@ class Admin_model extends Core_model
 	}
 
     /**
-     * 根据条件获取某个管理员数据
+     * 根据条件获取单个管理员数据
      *
      * @param $params
      * @param string $keyWord
@@ -113,10 +113,11 @@ class Admin_model extends Core_model
             "{$this->_tableName} AS a", 'a.*, ar.role_name', $params
         );
         $result = [];
+        $pid    = isset($params['parent_id']) ? intval($params['parent_id']) : 0;
 
         if ($isTree)
         {
-            getTreeData($data, 0, $result);
+            getTreeData($data, $pid, $result);
         }
         else
         {
